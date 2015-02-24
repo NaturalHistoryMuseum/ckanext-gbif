@@ -5,9 +5,8 @@ version = '0.1'
 setup(
 	name='ckanext-gbif',
 	version=version,
-	description="",
-	long_description="""\
-	""",
+	description="GBIF",
+	long_description="""GBIF Data Quality indicators""",
 	classifiers=[], # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
 	keywords='',
 	license='',
