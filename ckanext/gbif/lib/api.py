@@ -27,99 +27,103 @@ class GBIFAPI(object):
         # Return the result
         return r.json()
 
-    def list_occurrence_datasets(self):
-
-        params = {
-            'type': 'OCCURRENCE'
-        }
-
-        return self._request('dataset', params)
-
-    def get_dataset_errors(self, dataset_key):
+    def get_dataset_errors(self):
+        print pylons.config['ckanext.gbif.dataset_key']
 
 
 
-    def get_occurrences_in_area(self, geom):
 
-        limit = 300;
-        offset = 0
-
-        scientific_names = [
-            'Plecotus auritus',
-            'Pipistrellus pipistrellus',
-            'Myotis daubentoni',
-            'Nyctalus leisleri',
-            'Pipistrellus nathusii',
-            'Myotis nattereri',
-            'Nyctalus noctula',
-            'Eptesicus serotinus',
-            'Pipistrellus pygmaeus',
-            'Myotis mystacinus',
-            'Myotis brandtii',
-        ]
-
-        params = {
-            'geometry': geom,
-            'hasCoordinate': True,
-            'limit': limit,
-        }
-
-        with open('/vagrant/london-bats.csv', 'wb') as f:
-
-            csv_writer = csv.writer(f)
-
-            for name in scientific_names:
-
-                print 'STARTING: %s' % name
-
-                params['scientificName'] = name
-
-                genus = name.split(' ')[0]
-
-                # Reset offset
-                offset = 0
-
-                while True:
-
-                    print 'Retrieving %s' % offset
-
-                    params['offset'] = offset
-
-                    try:
-                        response = self._request('occurrence/search', params)
-                    except requests.exceptions.ConnectionError:
-                        pass
-                    else:
-
-                        print 'Count: ', response.get('count', 0)
-
-                        for record in response['results']:
-
-                            date = []
-                            for date_part in ['year', 'month', 'day']:
-                                try:
-                                    date.append(str(record[date_part]))
-                                except KeyError:
-                                    date.append('01')
-
-                            date_str = '-'.join(date)
-
-                            csv_writer.writerow([
-                                record[u'scientificName'],
-                                record[u'decimalLatitude'],
-                                record[u'decimalLongitude'],
-                                date_str,
-                                genus
-
-                            ])
-
-                    offset += limit
-
-                    if response['endOfRecords']:
-                        print 'END'
-                        break
+    # def list_occurrence_datasets(self):
+    #
+    #     params = {
+    #         'type': 'OCCURRENCE'
+    #     }
+    #
+    #     return self._request('dataset', params)
 
 
+
+    # def get_occurrences_in_area(self, geom):
+    #
+    #     limit = 300;
+    #     offset = 0
+    #
+    #     scientific_names = [
+    #         'Plecotus auritus',
+    #         'Pipistrellus pipistrellus',
+    #         'Myotis daubentoni',
+    #         'Nyctalus leisleri',
+    #         'Pipistrellus nathusii',
+    #         'Myotis nattereri',
+    #         'Nyctalus noctula',
+    #         'Eptesicus serotinus',
+    #         'Pipistrellus pygmaeus',
+    #         'Myotis mystacinus',
+    #         'Myotis brandtii',
+    #     ]
+    #
+    #     params = {
+    #         'geometry': geom,
+    #         'hasCoordinate': True,
+    #         'limit': limit,
+    #     }
+    #
+    #     with open('/vagrant/london-bats.csv', 'wb') as f:
+    #
+    #         csv_writer = csv.writer(f)
+    #
+    #         for name in scientific_names:
+    #
+    #             print 'STARTING: %s' % name
+    #
+    #             params['scientificName'] = name
+    #
+    #             genus = name.split(' ')[0]
+    #
+    #             # Reset offset
+    #             offset = 0
+    #
+    #             while True:
+    #
+    #                 print 'Retrieving %s' % offset
+    #
+    #                 params['offset'] = offset
+    #
+    #                 try:
+    #                     response = self._request('occurrence/search', params)
+    #                 except requests.exceptions.ConnectionError:
+    #                     pass
+    #                 else:
+    #
+    #                     print 'Count: ', response.get('count', 0)
+    #
+    #                     for record in response['results']:
+    #
+    #                         date = []
+    #                         for date_part in ['year', 'month', 'day']:
+    #                             try:
+    #                                 date.append(str(record[date_part]))
+    #                             except KeyError:
+    #                                 date.append('01')
+    #
+    #                         date_str = '-'.join(date)
+    #
+    #                         csv_writer.writerow([
+    #                             record[u'scientificName'],
+    #                             record[u'decimalLatitude'],
+    #                             record[u'decimalLongitude'],
+    #                             date_str,
+    #                             genus
+    #
+    #                         ])
+    #
+    #                 offset += limit
+    #
+    #                 if response['endOfRecords']:
+    #                     print 'END'
+    #                     break
+    #
+    #
 
 
 

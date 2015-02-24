@@ -23,6 +23,6 @@ setup(
             gbif = ckanext.gbif.plugin:GBIFPlugin
 
 	    [paste.paster_command]
-            gbif-api=ckanext.gbif.commands.api:GBIFAPICommand
+            gbif=ckanext.gbif.commands.gbif:GBIFCommand
 	""",
 )

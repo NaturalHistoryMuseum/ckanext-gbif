@@ -6,10 +6,11 @@ from ckan.plugins import toolkit
 from ckan.lib.cli import CkanCommand
 from ckanext.datastore.db import _get_engine
 import pylons
+from ckanext.gbif.lib.api import GBIFAPI
 
 log = logging.getLogger()
 
-class GBIFAPICommand(CkanCommand):
+class GBIFCommand(CkanCommand):
     """
 
     GBIF API COmmands
@@ -30,14 +31,14 @@ class GBIFAPICommand(CkanCommand):
 
         self._load_config()
 
-        # Set up context
-        user = toolkit.get_action('get_site_user')({'ignore_auth': True}, {})
-        self.context = {'user': user['name']}
-
-        # Set up datastore DB engine
-        self.engine = _get_engine({
-            'connection_url': pylons.config['ckan.datastore.write_url']
-        })
+        # # Set up context
+        # user = toolkit.get_action('get_site_user')({'ignore_auth': True}, {})
+        # self.context = {'user': user['name']}
+        #
+        # # Set up datastore DB engine
+        # self.engine = _get_engine({
+        #     'connection_url': pylons.config['ckan.datastore.write_url']
+        # })
 
         cmd = self.args[0]
 
@@ -48,5 +49,9 @@ class GBIFAPICommand(CkanCommand):
 
 
     def update_errors(self):
-        print 'UPDATE'
-        pass
+
+        # TODO: Loop through the records without errors
+
+
+        api = GBIFAPI()
+        api.get_dataset_errors()
