@@ -7,6 +7,7 @@ import csv
 from ckan.plugins import toolkit as tk
 from ckan.lib.cli import CkanCommand
 from ckanext.datastore.db import _get_engine
+from uuid import UUID
 from ckanext.gbif.lib.api import GBIFAPI
 
 
@@ -98,30 +99,18 @@ class GBIFCommand(CkanCommand):
         if not self.options.file_path:
             raise self.BadCommand('No filepath supplied')
 
-        count = 0
-
+        resource_id = pylons.config['ckanext.gbif.resource_id']
         zip_file = zipfile.ZipFile(self.options.file_path)
+
+        batch_size = 10000
+        total = 0
+
         with zip_file.open('occurrence.txt') as f:
 
-            update_values = list()
-
-            sql = """
-                UPDATE "{resource_id}"
-                AS r
-                SET "_gbif_id" = v."_gbif_id"
-                FROM (VALUES {update_values}) as v("occurrenceID", _gbif_id)
-                WHERE r."occurrenceID" = v."occurrenceID"::uuid;
-            """
-
-            update_values.append("('%s', %s)" % ('03ce209a-2164-498e-a5f6-a54534bd4165', 123))
+            # Build a list of records
+            records = list()
 
             for row in csv.DictReader(f, delimiter='\t'):
-
-                count+=1
-
-                # print row.keys()
-                errors = row['issue'].split(';') if row['issue'] else None
-                update_values.append("('%s', %s)" % (row['occurrenceID'], int(row['gbifID'])))
 
                 # FIXME: Some records coming from GBIF are missing the OccurrenceID field
                 # This seems to be when the habitat field is populated (and contains a tab?)
@@ -129,12 +118,29 @@ class GBIFCommand(CkanCommand):
                     continue
                     print 'Missing occurrence ID'
 
-                if count > 10000:
-                    connection = self.engine.connect()
-                    result = connection.execute(sql.format(
-                        resource_id=pylons.config['ckanext.gbif.resource_id'],
-                        update_values=','.join(update_values))
-                    )
+                # Ensure the Occurrence ID is valid
+                # TODO: Parsing CSV is mixing up fields
+                try:
+                    UUID(row['occurrenceID'], version=4)
+                except ValueError:
+                    # Value error - not a valid hex code for a UUID.
+                    continue
 
-                    print count
-                    return
+                records.append({
+                    'occurrence_id': row['occurrenceID'],
+                    'errors': row['issue'].split(';') if row['issue'] else [],
+                    'gbif_id': row['gbifID']
+                })
+
+                # Commit every 10000 rows
+                if len(records) > batch_size:
+                    tk.get_action('update_record_dqi')(self.context, {'resource_id': resource_id, 'records': records})
+                    # And reset the list
+                    records = list()
+
+                    total += batch_size
+                    print total
+
+            # If we have any remaining records, save them
+            if records:
+                tk.get_action('update_record_dqi')(self.context, {'resource_id': resource_id, 'records': records})
