@@ -1,7 +1,10 @@
 import json
+import ckan.logic as logic
 from ckan.plugins import toolkit
 from ckanext.gbif.plugin import DQI_UNKNOWN, DQI_MAJOR_ERRORS, DQI_MINOR_ERRORS, DQI_NO_ERRORS
 from ckanext.datastore.db import _get_unique_key
+
+_get_or_bust = logic.get_or_bust
 
 MAJOR_ERRORS = set([
     'TYPE_STATUS_INVALID',
@@ -64,9 +67,8 @@ def update_record_dqi(context, data_dict, **kw):
         - force: True to edit a read only resource (optional, defaults to False)
     """
     # Validate the request parameters
-    if 'resource_id' not in data_dict or 'filters' not in data_dict or 'errors' not in data_dict:
-        raise toolkit.ValidationError()
-    resource_id = data_dict['resource_id']
+    resource_id = _get_or_bust(data_dict, "resource_id")
+
     if isinstance(data_dict['filters'], basestring):
         try:
             filters = json.loads(data_dict['filters'])
@@ -74,6 +76,7 @@ def update_record_dqi(context, data_dict, **kw):
             raise toolkit.Invalid()
     else:
         filters = data_dict['filters']
+
     if isinstance(data_dict['errors'], basestring):
         try:
             errors = json.loads(data_dict['errors'])
@@ -81,6 +84,7 @@ def update_record_dqi(context, data_dict, **kw):
             raise toolkit.Invalid()
     else:
         errors = data_dict['errors']
+
     if 'force' not in data_dict:
         force = False
     elif isinstance(data_dict['force'], basestring):

@@ -4,8 +4,10 @@ DQI_MAJOR_ERRORS = 'Major errors'
 DQI_MINOR_ERRORS = 'Minor errors'
 DQI_NO_ERRORS = 'No errors'
 
-import ckan.plugins as p
 from ckanext.gbif.logic.actions import update_record_dqi
+import ckan.plugins as p
+import pylons
+from ckanext.datastore.db import _get_engine
 
 
 class GBIFPlugin(p.SingletonPlugin):
@@ -13,6 +15,49 @@ class GBIFPlugin(p.SingletonPlugin):
     GBIF plugin - Data Quality Indicators
     """
     p.implements(p.IActions, inherit=True)
+    p.implements(p.IConfigurable)
+    # p.implements(p.IConfigurer)
+    # p.implements(p.IPackageController, inherit=True)
+    # p.implements(p.ITemplateHelpers, inherit=True)
+
+    ## IConfigurable
+    def configure(self, config):
+        """
+        Called at the end of CKAN setup.
+        Create DOI table
+        """
+        self._create_gbif_id_column(pylons.config['ckanext.gbif.resource_id'])
+
+    @staticmethod
+    def _create_gbif_id_column(resource_id):
+        """
+        Create a column to store the GBIF ID, if it doesn't already exist
+        @param resource_id:
+        @return:
+        """
+
+        resource_id = pylons.config['ckanext.gbif.resource_id']
+        column_name = '_gbif_id'
+
+        try:
+            connection = _get_engine({'connection_url': pylons.config['ckan.datastore.write_url']}).connect()
+            # Check if the column exists
+            exists = connection.execute(u'''
+                SELECT 1
+                FROM information_schema.columns
+                WHERE table_name='{0}' AND column_name='{1}';
+            '''.format(resource_id, column_name)).scalar()
+
+            # If the GBIF column does not already exist, add it
+            if not exists:
+                # Add the GBIF ID column
+                connection.execute(u'ALTER TABLE "{0}" ADD COLUMN {1} int;'.format(resource_id, column_name))
+                # Add GBIF ID unique constraint - fails
+                # connection.execute(u'ALTER TABLE "{0}" ADD UNIQUE ({1});'.format(resource_id, column_name))
+
+        finally:
+            connection.close()
+
     def get_actions(self):
         return {
             'update_record_dqi':  update_record_dqi

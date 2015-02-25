@@ -27,10 +27,17 @@ class GBIFAPI(object):
         # Return the result
         return r.json()
 
-    def get_dataset_errors(self):
+    def occurrence_search(self, params):
+
+        # /occurrence/search
+
+        # Get the Dataset first
+        # tk.get_action('datastore_delete')(self.context, {'resource_id': resource['id'], 'force': True})
+
+        # lastInterpreted
+
+
         print pylons.config['ckanext.gbif.dataset_key']
-
-
 
 
     # def list_occurrence_datasets(self):
