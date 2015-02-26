@@ -1,0 +1,85 @@
+span.dqi-pill{
+    display: inline-block;
+    padding: 0 9px;
+    color: #fff;
+    text-transform: uppercase;
+    font-size: 12px;
+    margin-left: 5px;
+    height: 26px;
+    line-height: 26px;
+}
+
+span.dqi-major-errors  {
+    background: #DF2621;
+    border-color: #A42122;
+}
+
+span.dqi-minor-errors {
+    background: #FCC524;
+    border-color: #EDAC00;
+}
+
+span.dqi-major-errors,
+span.dqi-minor-errors{
+    cursor: pointer;
+}
+
+span.dqi-no-errors {
+    background: #91C400 ;
+    border-color: #73B100;
+}
+
+span.dqi-unknown{
+    border-color: #aaa;
+    background: #bbb;
+}
+
+div#dqi{
+    position: relative;
+}
+/* Box showing the errors */
+div#dqi div.dqi-errors{
+    position: absolute;
+    right:0;
+    top: 24px;
+    background: #E6E6E6;
+    width: 300px;
+    padding: 15px 10px;
+}
+
+div#dqi div.dqi-errors ul{
+    margin: 0 0 0 25px;
+}
+
+div#dqi div.dqi-errors ul li{
+    margin: 10px 0;
+}
+
+/* Hide the error list on start */
+.dqi-errors{
+    display:none;
+}
+
+.dqi-errors i{
+    display: block;
+    margin: 0 auto;
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
+}
+
+.dqi-errors p{
+    text-align: center;
+    margin-top: 3px;
+}
+
+/* On click - active class added */
+
+.active .dqi-errors{
+    display: block;
+}
+
+.active span.dqi-pill{
+    background: #E6E6E6;
+    color: #000;
+}

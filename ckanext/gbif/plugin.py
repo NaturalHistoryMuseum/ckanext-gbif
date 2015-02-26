@@ -4,10 +4,12 @@ DQI_MAJOR_ERRORS = 'Major errors'
 DQI_MINOR_ERRORS = 'Minor errors'
 DQI_NO_ERRORS = 'No errors'
 
-from ckanext.gbif.logic.actions import update_record_dqi
+import os
 import ckan.plugins as p
 import pylons
 from ckanext.datastore.db import _get_engine
+from ckanext.gbif.logic.actions import update_record_dqi
+from ckanext.gbif.lib.helpers import dqi_get_status_pill
 
 
 class GBIFPlugin(p.SingletonPlugin):
@@ -16,9 +18,8 @@ class GBIFPlugin(p.SingletonPlugin):
     """
     p.implements(p.IActions, inherit=True)
     p.implements(p.IConfigurable)
-    # p.implements(p.IConfigurer)
-    # p.implements(p.IPackageController, inherit=True)
-    # p.implements(p.ITemplateHelpers, inherit=True)
+    p.implements(p.IConfigurer)
+    p.implements(p.ITemplateHelpers, inherit=True)
 
     ## IConfigurable
     def configure(self, config):
@@ -27,6 +28,17 @@ class GBIFPlugin(p.SingletonPlugin):
         Create DOI table
         """
         self._create_gbif_id_column(pylons.config['ckanext.gbif.resource_id'])
+
+    ## IConfigurer
+    def update_config(self, config):
+
+        # Add template directory - we manually add to extra_template_paths
+        # rather than using add_template_directory to ensure it is always used
+        # to override templates
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        template_dir = os.path.join(root_dir, 'ckanext', 'gbif', 'theme', 'templates')
+        config['extra_template_paths'] = ','.join([template_dir, config.get('extra_template_paths', '')])
+        p.toolkit.add_resource('theme/fanstatic', 'ckanext-gbif')
 
     @staticmethod
     def _create_gbif_id_column(resource_id):
@@ -61,4 +73,11 @@ class GBIFPlugin(p.SingletonPlugin):
     def get_actions(self):
         return {
             'update_record_dqi':  update_record_dqi
+        }
+
+    # ITemplateHelpers
+    def get_helpers(self):
+
+        return {
+            'dqi_get_status_pill': dqi_get_status_pill
         }

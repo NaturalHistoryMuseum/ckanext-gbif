@@ -1,0 +1,21 @@
+{% ckan_extends %}
+
+{% block heading %}
+
+    <div class="row">
+
+        <div class="span8">
+            <h1 class="page-heading">{{ c.record_title }}</h1>
+        </div>
+
+        <div class="span4">
+
+            {% if c.record_dict['dqi'] and c.record_dict['dqi'] != 'N/A' %}
+                {% snippet "record/snippets/gbif-dqi.html", dqi=c.record_dict['dqi'], gbif_id=1055745245 %}
+            {% endif %}
+
+        </div>
+
+    </div>
+
+{% endblock %}

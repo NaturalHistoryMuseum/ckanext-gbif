@@ -1,0 +1,13 @@
+
+
+
+<div id='dqi' class="pull-right" data-module="gbif-dqi" data-module-gbif-id="{{ gbif_id }}">
+
+    GBIF quality indicators: {{ h.dqi_get_status_pill(dqi) }}
+    <div class="dqi-errors">
+        <i class="icon-spinner icon-spin"></i>
+    </div>
+
+</div>
+
+{% resource 'ckanext-gbif/dqi' %}

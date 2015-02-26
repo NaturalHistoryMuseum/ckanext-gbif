@@ -108,7 +108,7 @@ def update_record_dqi(context, data_dict, **kw):
         update_values.append("('%s', '%s', %s)" % (occurrence_id, dqi_status, int(gbif_id)))
 
     result = connection.execute(sql.format(
-        resource_id=pylons.config['ckanext.gbif.resource_id'],
+        resource_id=resource_id,
         update_values=','.join(update_values))
     )
 
