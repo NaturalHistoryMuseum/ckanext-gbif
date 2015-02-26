@@ -1,15 +1,15 @@
-DQI_NA = 'N/A'
-DQI_UNKNOWN = 'Unknown'
-DQI_MAJOR_ERRORS = 'Major errors'
-DQI_MINOR_ERRORS = 'Minor errors'
-DQI_NO_ERRORS = 'No errors'
-
 import os
 import ckan.plugins as p
 import pylons
 from ckanext.datastore.db import _get_engine
 from ckanext.gbif.logic.actions import update_record_dqi
-from ckanext.gbif.lib.helpers import dqi_get_status_pill, gbif_get_geography, gbif_get_classification
+from ckanext.gbif.lib.helpers import (
+    dqi_get_status_pill,
+    gbif_get_geography,
+    gbif_get_classification,
+    gbif_get_errors,
+    gbif_format_date
+)
 
 
 class GBIFPlugin(p.SingletonPlugin):
@@ -93,5 +93,7 @@ class GBIFPlugin(p.SingletonPlugin):
         return {
             'dqi_get_status_pill': dqi_get_status_pill,
             'gbif_get_classification': gbif_get_classification,
-            'gbif_get_geography': gbif_get_geography
+            'gbif_get_geography': gbif_get_geography,
+            'gbif_get_errors': gbif_get_errors,
+            'gbif_format_date': gbif_format_date
         }

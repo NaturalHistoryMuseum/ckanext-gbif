@@ -49,10 +49,39 @@ div#dqi div.dqi-errors{
 
 div#dqi div.dqi-errors ul{
     margin: 0 0 0 25px;
+    list-style: none;
+    padding:0;
 }
 
 div#dqi div.dqi-errors ul li{
-    margin: 10px 0;
+   margin: 10px 0;
+   padding-left: 0.5em;
+   text-indent: -.7em;
+}
+
+div#dqi div.dqi-errors ul li abbr{
+    margin-left: 8px;
+}
+
+div#dqi div.dqi-errors ul li:before{
+    content: "\f111";
+    font-family: FontAwesome;
+    font-weight: lighter;
+    font-style: normal;
+    text-decoration: inherit;
+    -webkit-font-smoothing: antialiased;
+    font-size: 8px;
+    line-height: 8px;
+    position: relative;
+    top: -2px;
+}
+
+div#dqi div.dqi-errors ul li.minor-errors:before{
+     color: #FCC524;
+}
+
+div#dqi div.dqi-errors ul li.major-errors:before{
+     color: #DF2621;
 }
 
 /* Hide the error list on start */
@@ -85,9 +114,12 @@ div#dqi div.dqi-errors ul li{
 }
 
 /* Record view */
+
 table#record-view th small{
     font-size: 14px;
     color: #818181;
+    position: relative;
+    left: -5px;
 }
 
 table#record-view tr td {

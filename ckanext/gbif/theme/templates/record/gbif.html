@@ -1,13 +1,5 @@
 {% extends "record/specimen.html" %}
 
-{% block content_primary_nav %}
-
-    {{ h.build_nav_icon('record', _('Normal view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
-    {{ h.build_nav_icon('dwc', _('Darwin Core view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
-    {{ h.build_nav_icon('gbif', _('GBIF record'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
-
-{% endblock %}
-
 {% block heading %}
 
      <h1 class="page-heading">GBIF interpreted record</h1>
@@ -16,12 +8,9 @@
 
 {% block record_data %}
 
-    {{ occurrence }}
-
-
     <table id="record-view">
 
-          <col width="250">
+          <col width="300">
           <col>
 
         {# Identification #}
@@ -122,7 +111,7 @@
 
         {% set geography = h.gbif_get_geography(occurrence) %}
 
-        {% if geography or occurrence['habitat'] or occurrence['countryCode'] or (occurrence['decimalLongitude'] and occurrence['decimalLatitude']) %}
+        {% if geography or occurrence['habitat'] or occurrence['countryCode'] or occurrence['islandGroup'] or (occurrence['decimalLongitude'] and occurrence['decimalLatitude']) %}
 
             <thead>
                 <tr>
@@ -144,7 +133,7 @@
 
                     <tr>
                         <td><strong>Coordinates</strong></td>
-                        <td>{{ occurrence['decimalLongitude'] }}, {{ occurrence['decimalLatitude'] }}</td>
+                        <td><a href="http://www.gbif.org/occurrence/{{ occurrence['gbifID'] }}#map" target="_blank" rel="nofollow">{{ occurrence['decimalLongitude'] }}, {{ occurrence['decimalLatitude'] }}</a></td>
                     </tr>
 
                 {% endif %}
@@ -156,6 +145,15 @@
                         <td>
                             {{ geography }}
                         </td>
+                    </tr>
+
+                {% endif %}
+
+                {% if occurrence['islandGroup'] %}
+
+                    <tr>
+                        <td><strong>Islands</strong></td>
+                        <td>{{ occurrence['islandGroup'] }}</td>
                     </tr>
 
                 {% endif %}
@@ -173,7 +171,33 @@
 
         {% endif %}
 
-        {# Location #}
+        {% if occurrence['issues'] %}
+
+            {% set gbif_errors = h.gbif_get_errors() %}
+
+            <thead>
+                <tr>
+                    <th colspan="2">Data Quality Issues</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% for issue in occurrence['issues'] %}
+
+                    {% set error = gbif_errors[issue] %}
+
+                    <tr>
+                        <td><strong>{{ error['title'] }}</strong></td>
+                        <td>{{ error['description'] }}</td>
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        {% endif %}
+
+        {# Publication details #}
 
         <thead>
             <tr>
@@ -184,12 +208,12 @@
 
             <tr>
                 <td><strong>Last interpreted</strong></td>
-                <td>{{ occurrence['lastInterpreted'] }}</td>
+                <td>{{ h.gbif_format_date(occurrence['lastInterpreted']) }}</td>
             </tr>
 
             <tr>
                 <td><strong>Last parsed</strong></td>
-                <td>{{ occurrence['lastParsed'] }}</td>
+                <td>{{ h.gbif_format_date(occurrence['lastParsed']) }}</td>
             </tr>
 
             <tr>

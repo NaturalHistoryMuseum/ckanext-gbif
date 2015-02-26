@@ -1,35 +1,10 @@
 
 import logging
-import json
-import urllib
-import re
 import os
-import urllib
-
-from beaker.cache import cache_region
-from pylons import config
-from collections import OrderedDict
-from jinja2.filters import do_truncate
-
-import ckan.model as model
-import ckan.logic as logic
-import ckan.plugins.toolkit as toolkit
-from ckan.common import c, _, request
-from ckan.lib.helpers import url_for, link_to, snippet, _follow_objects, _VALID_GRAVATAR_DEFAULTS, get_allowed_view_types as ckan_get_allowed_view_types
+import dateutil.parser
 from webhelpers.html import literal
+from ckanext.gbif import GBIF_ERRORS
 
-from ckanext.nhm.lib.form import list_to_form_options
-from ckanext.nhm.logic.schema import DATASET_TYPE_VOCABULARY, UPDATE_FREQUENCIES
-from ckanext.nhm.views import *
-from ckanext.nhm.lib.resource import (
-    resource_get_ordered_fields,
-    resource_filter_options,
-    parse_request_filters,
-    FIELD_DISPLAY_FILTER,
-    resource_filter_get_cookie,
-    resource_filter_set_cookie,
-    resource_filter_delete_cookie
-)
 
 log = logging.getLogger(__name__)
 
@@ -74,7 +49,7 @@ def gbif_get_classification(occurrence):
         elif name:
             classification.append(name)
 
-    return literal(' <i class="icon-double-angle-right" /> '.join(classification))
+    return literal(' <i class="icon-double-angle-right"></i> '.join(classification))
 
 
 def gbif_get_geography(occurrence):
@@ -88,4 +63,10 @@ def gbif_get_geography(occurrence):
             geography.append(value.replace('_', ' '))
 
     return literal(' <i class="icon-double-angle-right" /> '.join(geography))
+
+def gbif_get_errors():
+    return GBIF_ERRORS
+
+def gbif_format_date(date_str):
+    return dateutil.parser.parse(date_str).strftime("%B %d, %Y. %X")
 
