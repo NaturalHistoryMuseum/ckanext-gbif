@@ -83,3 +83,13 @@ div#dqi div.dqi-errors ul li{
     background: #E6E6E6;
     color: #000;
 }
+
+/* Record view */
+table#record-view th small{
+    font-size: 14px;
+    color: #818181;
+}
+
+table#record-view tr td {
+    padding: 6px 0;
+}

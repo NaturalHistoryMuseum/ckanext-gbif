@@ -9,7 +9,7 @@ import ckan.plugins as p
 import pylons
 from ckanext.datastore.db import _get_engine
 from ckanext.gbif.logic.actions import update_record_dqi
-from ckanext.gbif.lib.helpers import dqi_get_status_pill
+from ckanext.gbif.lib.helpers import dqi_get_status_pill, gbif_get_geography, gbif_get_classification
 
 
 class GBIFPlugin(p.SingletonPlugin):
@@ -20,6 +20,7 @@ class GBIFPlugin(p.SingletonPlugin):
     p.implements(p.IConfigurable)
     p.implements(p.IConfigurer)
     p.implements(p.ITemplateHelpers, inherit=True)
+    p.implements(p.IRoutes, inherit=True)
 
     ## IConfigurable
     def configure(self, config):
@@ -28,17 +29,6 @@ class GBIFPlugin(p.SingletonPlugin):
         Create DOI table
         """
         self._create_gbif_id_column(pylons.config['ckanext.gbif.resource_id'])
-
-    ## IConfigurer
-    def update_config(self, config):
-
-        # Add template directory - we manually add to extra_template_paths
-        # rather than using add_template_directory to ensure it is always used
-        # to override templates
-        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        template_dir = os.path.join(root_dir, 'ckanext', 'gbif', 'theme', 'templates')
-        config['extra_template_paths'] = ','.join([template_dir, config.get('extra_template_paths', '')])
-        p.toolkit.add_resource('theme/fanstatic', 'ckanext-gbif')
 
     @staticmethod
     def _create_gbif_id_column(resource_id):
@@ -70,6 +60,28 @@ class GBIFPlugin(p.SingletonPlugin):
         finally:
             connection.close()
 
+    ## IConfigurer
+    def update_config(self, config):
+
+        # Add template directory - we manually add to extra_template_paths
+        # rather than using add_template_directory to ensure it is always used
+        # to override templates
+        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+        template_dir = os.path.join(root_dir, 'ckanext', 'gbif', 'theme', 'templates')
+        config['extra_template_paths'] = ','.join([template_dir, config.get('extra_template_paths', '')])
+        p.toolkit.add_resource('theme/fanstatic', 'ckanext-gbif')
+
+    ## IRoutes
+    def before_map(self, map):
+
+        # Add GBIF record view
+        map.connect('gbif', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/gbif',
+            controller='ckanext.gbif.controllers.gbif:GBIFController',
+            action='view'
+        )
+
+        return map
+
     def get_actions(self):
         return {
             'update_record_dqi':  update_record_dqi
@@ -79,5 +91,7 @@ class GBIFPlugin(p.SingletonPlugin):
     def get_helpers(self):
 
         return {
-            'dqi_get_status_pill': dqi_get_status_pill
+            'dqi_get_status_pill': dqi_get_status_pill,
+            'gbif_get_classification': gbif_get_classification,
+            'gbif_get_geography': gbif_get_geography
         }

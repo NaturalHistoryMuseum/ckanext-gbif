@@ -1,0 +1,216 @@
+{% extends "record/specimen.html" %}
+
+{% block content_primary_nav %}
+
+    {{ h.build_nav_icon('record', _('Normal view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
+    {{ h.build_nav_icon('dwc', _('Darwin Core view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
+    {{ h.build_nav_icon('gbif', _('GBIF record'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
+
+{% endblock %}
+
+{% block heading %}
+
+     <h1 class="page-heading">GBIF interpreted record</h1>
+
+{% endblock %}
+
+{% block record_data %}
+
+    {{ occurrence }}
+
+
+    <table id="record-view">
+
+          <col width="250">
+          <col>
+
+        {# Identification #}
+
+        {% set classification = h.gbif_get_classification(occurrence) %}
+
+        {% if classification or occurrence['speciesKey'] or occurrence['identifiedBy'] %}
+
+            <thead>
+                <tr>
+                    <th>Identification details</th>
+                    <th><small>According to <a href="http://www.gbif.org/dataset/d7dddbf4-2cf0-4f39-9b2a-bb099caae36c" target="_blank" rel="nofollow">GBIF Backbone Taxonomy</a></small></th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% if occurrence['speciesKey'] %}
+
+                    <tr>
+                        <td><strong>Identified as species</strong></td>
+                        <td>
+                            <a href="http://www.gbif.org/species/{{ occurrence['speciesKey'] }}" target="_blank" rel="nofollow">{{ occurrence['scientificName'] }}</a>
+                        </td>
+                    </tr>
+
+                {% endif %}
+
+                {% if classification %}
+
+                    <tr>
+                        <td><strong>Taxonomic classification</strong></td>
+                        <td>
+                            {{ classification }}
+                        </td>
+                    </tr>
+
+                {% endif %}
+
+                {% if occurrence['identifiedBy'] %}
+
+                    <tr>
+                        <td><strong>Identified</strong></td>
+                        <td>
+                            {{ occurrence['identifiedBy'] }}
+                        </td>
+                    </tr>
+
+                {% endif %}
+
+            </tbody>
+
+        {% endif %}
+
+        {# Occurrence details #}
+
+        {% if occurrence['recordedBy'] or occurrence['eventDate'] or occurrence['recordNumber'] %}
+
+            <thead>
+                <tr>
+                    <th colspan="2">Occurrence details</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% if occurrence['recordedBy'] %}
+
+                    <tr>
+                        <td><strong>Recorded by</strong></td>
+                        <td>{{ occurrence['recordedBy'] }}</td>
+                    </tr>
+
+                {% endif %}
+
+                {% if occurrence['eventDate'] %}
+
+                    <tr>
+                        <td><strong>Date recorded</strong></td>
+                        <td>{{ occurrence['eventDate'] }}</td>
+                    </tr>
+
+                {% endif %}
+
+
+                {% if occurrence['recordNumber'] %}
+
+                    <tr>
+                        <td><strong>Record number</strong></td>
+                        <td>{{ occurrence['recordNumber'] }}</td>
+                    </tr>
+
+                {% endif %}
+
+            </tbody>
+
+        {% endif %}
+
+        {# Location #}
+
+        {% set geography = h.gbif_get_geography(occurrence) %}
+
+        {% if geography or occurrence['habitat'] or occurrence['countryCode'] or (occurrence['decimalLongitude'] and occurrence['decimalLatitude']) %}
+
+            <thead>
+                <tr>
+                    <th colspan="2">Location</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {% if occurrence['countryCode'] %}
+
+                    <tr>
+                        <td><strong>Country</strong></td>
+                        <td><a href="http://www.gbif.org/country/{{ occurrence['countryCode'] }}" target="_blank" rel="nofollow">{{ occurrence['country'] or occurrence['countryCode'] }}</a></td>
+                    </tr>
+
+                {% endif %}
+
+                {% if occurrence['decimalLongitude'] and occurrence['decimalLatitude'] %}
+
+                    <tr>
+                        <td><strong>Coordinates</strong></td>
+                        <td>{{ occurrence['decimalLongitude'] }}, {{ occurrence['decimalLatitude'] }}</td>
+                    </tr>
+
+                {% endif %}
+
+                {% if geography %}
+
+                    <tr>
+                        <td><strong>Geographic classification</strong></td>
+                        <td>
+                            {{ geography }}
+                        </td>
+                    </tr>
+
+                {% endif %}
+
+                {% if occurrence['habitat'] %}
+
+                    <tr>
+                        <td><strong>Habitat</strong></td>
+                        <td>{{ occurrence['habitat'] }}</td>
+                    </tr>
+
+                {% endif %}
+
+            </tbody>
+
+        {% endif %}
+
+        {# Location #}
+
+        <thead>
+            <tr>
+                <th colspan="2">GBIF Publication details</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            <tr>
+                <td><strong>Last interpreted</strong></td>
+                <td>{{ occurrence['lastInterpreted'] }}</td>
+            </tr>
+
+            <tr>
+                <td><strong>Last parsed</strong></td>
+                <td>{{ occurrence['lastParsed'] }}</td>
+            </tr>
+
+            <tr>
+                <td><strong>Occurrence</strong></td>
+                <td><a href="http://www.gbif.org/occurrence/{{ occurrence['gbifID'] }}" target="_blank" rel="nofollow">{{ occurrence['gbifID'] }}</a></td>
+            </tr>
+
+            <tr>
+                <td><strong>Dataset</strong></td>
+                <td><a href="http://www.gbif.org/dataset/{{ occurrence['datasetKey'] }}" target="_blank" rel="nofollow">Dataset</a></td>
+            </tr>
+
+            <tr>
+                <td><strong>Publisher</strong></td>
+                <td><a href="http://www.gbif.org/publisher/{{ occurrence['publishingOrgKey'] }}" target="_blank" rel="nofollow">Natural History Museum</a></td>
+            </tr>
+
+        </tbody>
+
+    </table>
+
+    {% resource 'ckanext-gbif/record' %}
+
+{% endblock %}
