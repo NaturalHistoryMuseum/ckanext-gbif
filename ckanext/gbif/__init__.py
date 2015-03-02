@@ -5,8 +5,8 @@ Created by 'bens3' on 2013-06-21.
 Copyright (c) 2013 'bens3'. All rights reserved.
 """
 
+DQI_UNKNOWN = None
 DQI_NA = 'N/A'
-DQI_UNKNOWN = 'Unknown'
 DQI_MAJOR_ERRORS = 'Major errors'
 DQI_MINOR_ERRORS = 'Minor errors'
 DQI_NO_ERRORS = 'No errors'
