@@ -44,6 +44,8 @@ class GBIFController(p.toolkit.BaseController):
 
         occurrence_id = c.record_dict.get('occurrenceID')
 
+        c.record_title = c.record_dict.get('catalogNumber', None) or occurrence_id
+
         # Load the gbif_id (it's a hidden field so we need to manually add it
         sql = """SELECT _gbif_id FROM "{resource_id}" WHERE "occurrenceID"='{occurrence_id}'""".format(
             resource_id=c.resource['id'],
