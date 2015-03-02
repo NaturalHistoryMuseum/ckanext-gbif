@@ -102,7 +102,7 @@ class GBIFCommand(CkanCommand):
         resource_id = pylons.config['ckanext.gbif.resource_id']
         zip_file = zipfile.ZipFile(self.options.file_path)
 
-        batch_size = 100
+        batch_size = 1000
         total = 0
 
         with zip_file.open('occurrence.txt') as f:
