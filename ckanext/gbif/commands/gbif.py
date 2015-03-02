@@ -134,6 +134,9 @@ class GBIFCommand(CkanCommand):
 
                 # Commit every 10000 rows
                 if len(records) > batch_size:
+
+                    print "Updating datastore"
+
                     tk.get_action('update_record_dqi')(self.context, {'resource_id': resource_id, 'records': records})
                     # And reset the list
                     records = list()
