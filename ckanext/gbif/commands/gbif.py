@@ -28,7 +28,7 @@ class GBIFCommand(CkanCommand):
 
     Commands:
 
-        paster gbif-api update-errors -c /etc/ckan/default/development.ini
+        paster gbif-api load-errors -c /etc/ckan/default/development.ini
 
     """
     summary = __doc__.split('\n')[0]
