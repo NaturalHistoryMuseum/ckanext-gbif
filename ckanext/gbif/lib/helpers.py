@@ -49,7 +49,7 @@ def gbif_get_classification(occurrence):
         elif name:
             classification.append(name)
 
-    return literal(' <i class="icon-double-angle-right"></i> '.join(classification))
+    return literal(' <i class="icon-angle-right"></i> '.join(classification))
 
 
 def gbif_get_geography(occurrence):
@@ -62,7 +62,7 @@ def gbif_get_geography(occurrence):
         if value:
             geography.append(value.replace('_', ' '))
 
-    return literal(' <i class="icon-double-angle-right" /> '.join(geography))
+    return literal(' <i class="icon-angle-right"></i> '.join(geography))
 
 def gbif_get_errors():
     return GBIF_ERRORS
