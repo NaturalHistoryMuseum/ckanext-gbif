@@ -36,7 +36,7 @@ def update_record_dqi(context, data_dict, **kw):
     sql = """
         UPDATE "{resource_id}"
         AS r
-        SET "dqi" = v."dqi", "_gbif_id" = v."_gbif_id"
+        SET "dqi" = v."dqi"::dqi, "_gbif_id" = v."_gbif_id"
         FROM (VALUES {update_values}) as v("occurrenceID", dqi, _gbif_id)
         WHERE r."occurrenceID" = v."occurrenceID"::uuid;
     """
