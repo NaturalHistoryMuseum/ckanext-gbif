@@ -19,7 +19,8 @@ NotFound = logic.NotFound
 NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 
-UNKNOWN = 'Unknown'
+BATCH_SIZE = 100  # Commit every x number of rows
+COMMIT_FROM = 1786000  # If set, only commit past x number of rows (use if there's been an error)
 
 class GBIFCommand(CkanCommand):
     """
@@ -60,36 +61,36 @@ class GBIFCommand(CkanCommand):
         else:
             print 'Command %s not recognized' % cmd
 
-    def update_errors(self):
-
-        gbif_dataset_key = pylons.config['ckanext.gbif.dataset_key']
-        resource_id = pylons.config['ckanext.gbif.resource_id']
-
-        resource = tk.get_action('resource_show')(self.context, {'id': resource_id})
-
-        # Do we have any new/updated records? (dqi == Unknown)
-        sql = """
-          SELECT count(*) FROM "{resource_id}" WHERE dqi='{dqi}'
-        """.format(resource_id=resource_id, dqi=UNKNOWN)
-
-        try:
-            result = tk.get_action('datastore_search_sql')(self.context, {'sql': sql})
-        except ValidationError, e:
-            log.critical('Error retrieving last modified date %s', e)
-        else:
-
-            count = int(result['records'][0][u'count'])
-
-            if count:
-                print '%s records to update' % count
-
-                # 2015-02-24T14:15:30.053897
-
-            # If we have records, update
-
-                print resource['last_modified']
-
-            # print result
+    # def update_errors(self):
+    #
+    #     gbif_dataset_key = pylons.config['ckanext.gbif.dataset_key']
+    #     resource_id = pylons.config['ckanext.gbif.resource_id']
+    #
+    #     resource = tk.get_action('resource_show')(self.context, {'id': resource_id})
+    #
+    #     # Do we have any new/updated records? (dqi == Unknown)
+    #     sql = """
+    #       SELECT count(*) FROM "{resource_id}" WHERE dqi='{dqi}'
+    #     """.format(resource_id=resource_id, dqi=UNKNOWN)
+    #
+    #     try:
+    #         result = tk.get_action('datastore_search_sql')(self.context, {'sql': sql})
+    #     except ValidationError, e:
+    #         log.critical('Error retrieving last modified date %s', e)
+    #     else:
+    #
+    #         count = int(result['records'][0][u'count'])
+    #
+    #         if count:
+    #             print '%s records to update' % count
+    #
+    #             # 2015-02-24T14:15:30.053897
+    #
+    #         # If we have records, update
+    #
+    #             print resource['last_modified']
+    #
+    #         # print result
 
     def load_errors_from_file(self):
         """
@@ -102,7 +103,6 @@ class GBIFCommand(CkanCommand):
         resource_id = pylons.config['ckanext.gbif.resource_id']
         zip_file = zipfile.ZipFile(self.options.file_path)
 
-        batch_size = 100
         total = 0
 
         with zip_file.open('occurrence.txt') as f:
@@ -133,15 +133,16 @@ class GBIFCommand(CkanCommand):
                 })
 
                 # Commit every 10000 rows
-                if len(records) > batch_size:
+                if len(records) > BATCH_SIZE:
 
-                    print "Updating datastore"
+                    if not COMMIT_FROM or total > COMMIT_FROM:
+                        print "Updating datastore"
+                        tk.get_action('update_record_dqi')(self.context, {'resource_id': resource_id, 'records': records})
 
-                    tk.get_action('update_record_dqi')(self.context, {'resource_id': resource_id, 'records': records})
                     # And reset the list
                     records = list()
 
-                    total += batch_size
+                    total += BATCH_SIZE
                     print total
 
             # If we have any remaining records, save them
