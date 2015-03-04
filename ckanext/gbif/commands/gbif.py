@@ -20,12 +20,12 @@ NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 
 BATCH_SIZE = 100  # Commit every x number of rows
-COMMIT_FROM = 2027000  # If set, only commit past x number of rows (use if there's been an error)
+COMMIT_FROM = 2229900  # If set, only commit past x number of rows (use if there's been an error)
 
 class GBIFCommand(CkanCommand):
     """
 
-    GBIF API COmmands
+    GBIF API Commands
 
     Commands:
 
