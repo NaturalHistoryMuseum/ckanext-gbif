@@ -19,7 +19,7 @@ class GBIFAPI(object):
 
         endpoint = os.path.join(GBIF_ENDPOINT, path)
         auth = (pylons.config['ckanext.gbif.username'], pylons.config['ckanext.gbif.password'])
-        r = requests.get(endpoint, auth=auth, params=params)
+        r = requests.get(endpoint, auth=auth, params=params, timeout=10)
 
         # Raise exception if we have an error
         r.raise_for_status()
