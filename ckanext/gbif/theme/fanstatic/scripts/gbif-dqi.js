@@ -16,13 +16,16 @@ this.ckan.module('gbif-dqi', function ($, _) {
          * Returns nothing.
          */
         initialize: function () {
-            this.$pill = this.$('span.dqi-major-errors, span.dqi-minor-errors');
-            this.$errors = this.$('div.dqi-errors')
-            this.$pill.on('click', jQuery.proxy(this._onClick, this));
+            // Only add interactions if we have gbifId
+            if(this.options.gbifId){
+                this.$pill = this.$('span.dqi-major-errors, span.dqi-minor-errors');
+                this.$errors = this.$('div.dqi-errors')
+                this.$pill.on('click', jQuery.proxy(this._onClick, this));
 
-            // If anyone clicks anywhere else on the page, hide it
-            $('body').on('click', jQuery.proxy(this.hide, this))
-            $('div.dqi-errors').on('click', function(e){e.stopPropagation();})
+                // If anyone clicks anywhere else on the page, hide it
+                $('body').on('click', jQuery.proxy(this.hide, this))
+                $('div.dqi-errors').on('click', function(e){e.stopPropagation();})
+            }
 
         },
 

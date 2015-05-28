@@ -1,7 +1,4 @@
-
-
-
-<div id='dqi' class="pull-right" data-module="gbif-dqi" data-module-gbif-id="{{ gbif_id }}" data-module-gbif-errors="{{ h.dump_json(h.gbif_get_errors()) }}">
+<div id='dqi' class="pull-right" data-module="gbif-dqi" data-module-gbif-id="{{ gbif_id or 0 }}" data-module-gbif-errors="{{ h.dump_json(h.gbif_get_errors()) }}">
 
     GBIF quality indicators: {{ h.dqi_get_status_pill(dqi) }}
     <div class="dqi-errors">
