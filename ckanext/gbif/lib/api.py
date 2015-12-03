@@ -8,24 +8,32 @@ Copyright (c) 2013 'bens3'. All rights reserved.
 import os
 import requests
 import pylons
-
+from pylons import config
 
 GBIF_ENDPOINT = 'http://api.gbif.org/v1'
 
-class GBIFAPI(object):
 
-    @staticmethod
-    def _request(path, params={}):
+class GBIFAPI():
 
-        endpoint = os.path.join(GBIF_ENDPOINT, path)
-        auth = (pylons.config['ckanext.gbif.username'], pylons.config['ckanext.gbif.password'])
-        r = requests.get(endpoint, auth=auth, params=params, timeout=10)
+    def __init__(self):
+        self.auth = (config['ckanext.gbif.username'], config['ckanext.gbif.password'])
 
-        # Raise exception if we have an error
+    def request_download(self, dataset_key):
+        path = '/occurrence/download/request'
+        params = {
+            "creator": config['ckanext.gbif.username'],
+            "notification_address": ["ben@benscott.co.uk"],
+            "predicate":
+                {
+                    "type": "equals",
+                    "key": "datasetKey",
+                    "value": dataset_key
+                }
+        }
+
+        r = requests.post(GBIF_ENDPOINT + path, json=params, auth=self.auth)
         r.raise_for_status()
 
         # Return the result
         return r.json()
 
-    def get_occurrence(self, occurrence_id):
-        return self._request('occurrence/%s' % occurrence_id)
