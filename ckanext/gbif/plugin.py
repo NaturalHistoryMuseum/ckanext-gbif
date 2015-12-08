@@ -1,64 +1,25 @@
 import os
-import ckan.plugins as p
 import pylons
-from ckanext.datastore.db import _get_engine
-from ckanext.gbif.logic.actions import update_record_dqi
+import ckan.plugins as p
+from ckanext.datastore.interfaces import IDatastore
+from ckanext.gbif.logic.action import gbif_record_show
 from ckanext.gbif.lib.helpers import (
-    dqi_get_status_pill,
+    dqi_parse_errors,
+    dqi_get_severity,
     gbif_get_geography,
     gbif_get_classification,
-    gbif_get_errors,
-    gbif_format_date
+    gbif_render_datetime
 )
-
 
 class GBIFPlugin(p.SingletonPlugin):
     """
     GBIF plugin - Data Quality Indicators
     """
     p.implements(p.IActions, inherit=True)
-    p.implements(p.IConfigurable)
     p.implements(p.IConfigurer)
-    p.implements(p.ITemplateHelpers, inherit=True)
     p.implements(p.IRoutes, inherit=True)
-
-    ## IConfigurable
-    def configure(self, config):
-        """
-        Called at the end of CKAN setup.
-        Create DOI table
-        """
-        self._create_gbif_id_column(pylons.config['ckanext.gbif.resource_id'])
-
-    @staticmethod
-    def _create_gbif_id_column(resource_id):
-        """
-        Create a column to store the GBIF ID, if it doesn't already exist
-        @param resource_id:
-        @return:
-        """
-
-        resource_id = pylons.config['ckanext.gbif.resource_id']
-        column_name = '_gbif_id'
-
-        try:
-            connection = _get_engine({'connection_url': pylons.config['ckan.datastore.write_url']}).connect()
-            # Check if the column exists
-            exists = connection.execute(u'''
-                SELECT 1
-                FROM information_schema.columns
-                WHERE table_name='{0}' AND column_name='{1}';
-            '''.format(resource_id, column_name)).scalar()
-
-            # If the GBIF column does not already exist, add it
-            if not exists:
-                # Add the GBIF ID column
-                connection.execute(u'ALTER TABLE "{0}" ADD COLUMN {1} int;'.format(resource_id, column_name))
-                # Add GBIF ID unique constraint - fails
-                # connection.execute(u'ALTER TABLE "{0}" ADD UNIQUE ({1});'.format(resource_id, column_name))
-
-        finally:
-            connection.close()
+    p.implements(p.ITemplateHelpers)
+    p.implements(IDatastore, inherit=True)
 
     ## IConfigurer
     def update_config(self, config):
@@ -84,16 +45,33 @@ class GBIFPlugin(p.SingletonPlugin):
 
     def get_actions(self):
         return {
-            'update_record_dqi':  update_record_dqi
+            'gbif_record_show':  gbif_record_show
         }
 
     # ITemplateHelpers
     def get_helpers(self):
 
         return {
-            'dqi_get_status_pill': dqi_get_status_pill,
+            'dqi_get_severity': dqi_get_severity,
+            'dqi_parse_errors': dqi_parse_errors,
             'gbif_get_classification': gbif_get_classification,
             'gbif_get_geography': gbif_get_geography,
-            'gbif_get_errors': gbif_get_errors,
-            'gbif_format_date': gbif_format_date
+            'gbif_render_datetime': gbif_render_datetime
         }
+
+    ## IDataStore
+    def datastore_search(self, context, data_dict, all_field_ids, query_dict):
+
+        resource_id = pylons.config['ckanext.gbif.resource_id']
+
+        # print all_field_ids
+        if resource_id == data_dict['resource_id']:
+            # Add the issue field to the query
+            query_dict['select'].insert(1, 'g."gbifIssue" as dqi')
+            # And add the GBIF ID - wen can use this in the template to check
+            # if we have a GBIF record
+            query_dict['select'].append('g."gbifID" as _gbif_id')
+            query_dict['ts_query'] = 'LEFT JOIN gbif.occurrence g ON g."gbifOccurrenceID" = "%s"."occurrenceID"' % data_dict['resource_id']
+
+        # print query_dict
+        return query_dict

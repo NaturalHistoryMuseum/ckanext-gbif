@@ -11,20 +11,17 @@ from uuid import UUID
 from ckanext.gbif.lib.api import GBIFAPI
 from sqlalchemy.exc import StatementError
 
-
-log = logging.getLogger()
-
 log = logging.getLogger(__name__)
 
 NotFound = logic.NotFound
 NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 
-# BATCH_SIZE = 100  # Commit every x number of rows
-# COMMIT_FROM = None  # If set, only commit past x number of rows (use if there's been an error)
 
 GBIF_ARCHIVE = '/Users/bens3/Downloads/0017401-151016162008034.zip'
 BATCH_SIZE = 10000
+
+# FIXME: publishingOrgKey missing
 
 class GBIFCommand(CkanCommand):
     """
@@ -34,6 +31,7 @@ class GBIFCommand(CkanCommand):
     Commands:
 
         paster gbif load-dataset -c /etc/ckan/default/development.ini
+        paster gbif load-dataset -c /Users/bens3/Projects/NaturalHistoryMuseum/DataPortal/ckan/etc/default/development.ini
 
     """
     summary = __doc__.split('\n')[0]
@@ -46,10 +44,10 @@ class GBIFCommand(CkanCommand):
     field_names = [
         # GBIF data
         'gbifID',
-        'occurrenceID', 'lastInterpreted', 'lastParsed', 'publishingOrgKey', 'datasetKey',
+        'occurrenceID', 'lastInterpreted', 'lastParsed',
         'issue',
         # Classification
-        'kingdom', 'kingdomKey', 'phylum', 'phylumKey', 'class', 'classKey', 'order', 'orderKey', 'family', 'familyKey', 'genus', 'genusKey', 'species', 'speciesKey', 'taxonRank',
+        'kingdom', 'kingdomKey', 'phylum', 'phylumKey', 'class', 'classKey', 'order', 'orderKey', 'family', 'familyKey', 'genus', 'genusKey', 'subgenus', 'subgenusKey', 'species', 'speciesKey', 'taxonRank',
         # Identification
         'identifiedBy', 'scientificName', 'taxonKey',
         # Collection event
@@ -87,38 +85,7 @@ class GBIFCommand(CkanCommand):
         else:
             print 'Command %s not recognized' % cmd
 
-    # def update_errors(self):
-    #
-    #     gbif_dataset_key = pylons.config['ckanext.gbif.dataset_key']
-    #     resource_id = pylons.config['ckanext.gbif.resource_id']
-    #
-    #     resource = tk.get_action('resource_show')(self.context, {'id': resource_id})
-    #
-    #     # Do we have any new/updated records? (dqi == Unknown)
-    #     sql = """
-    #       SELECT count(*) FROM "{resource_id}" WHERE dqi='{dqi}'
-    #     """.format(resource_id=resource_id, dqi=UNKNOWN)
-    #
-    #     try:
-    #         result = tk.get_action('datastore_search_sql')(self.context, {'sql': sql})
-    #     except ValidationError, e:
-    #         log.critical('Error retrieving last modified date %s', e)
-    #     else:
-    #
-    #         count = int(result['records'][0][u'count'])
-    #
-    #         if count:
-    #             print '%s records to update' % count
-    #
-    #             # 2015-02-24T14:15:30.053897
-    #
-    #         # If we have records, update
-    #
-    #             print resource['last_modified']
-    #
-    #         # print result
-
-    def _ensure_gbif_table(self):
+    def _create_gbif_table(self):
         """
         Make sure the GBIF
         :return:
@@ -129,6 +96,8 @@ class GBIFCommand(CkanCommand):
         if not schema_exists:
             print 'Creating schema %s' % self.pg_schema
             self.connection.execute('CREATE SCHEMA %s' % self.pg_schema)
+            # FIXME
+            # self.connection.execute('GRANT ALL ON SCHEMA foo TO staff' % self.pg_schema)
 
         # Drop table if it exists
         self.connection.execute('DROP TABLE IF EXISTS {schema}.{table}'.format(
@@ -137,26 +106,60 @@ class GBIFCommand(CkanCommand):
         ))
         # And recreate the table
         print 'Creating table %s.%s' % (self.pg_schema, self.pg_table)
+
+        columns = []
+        for fn in self.field_names:
+            col = self._get_column_name(fn)
+            if fn == self.uuid_field_name:
+                columns.append('"%s" uuid NOT NULL' % col)
+            else:
+                columns.append('"%s" text DEFAULT NULL' % col)
+
         sql = "CREATE TABLE {schema}.{table} ({columns})".format(
             schema=self.pg_schema,
             table=self.pg_table,
-            columns=', '.join(['"%s" text DEFAULT NULL' % f for f in self.field_names]),
+            columns=', '.join(columns),
         )
         self.connection.execute(sql)
+        # Grant access
+        self.connection.execute('GRANT USAGE ON SCHEMA {schema} TO {table}'.format(
+            schema=self.pg_schema,
+            table=self.pg_table
+        ))
+        self.connection.execute('GRANT SELECT ON ALL TABLES IN SCHEMA {schema} TO {table}'.format(
+            schema=self.pg_schema,
+            table=self.pg_table
+        ))
+
+    @staticmethod
+    def _get_column_name(field_name):
+        """
+        To avoid collisions with datastore columns
+        Prefix field names with 'GBIF'
+        :return:
+        """
+        # If this already starts with gbif (e.g. gbifID) ignore it
+        if field_name[0:4] == 'gbif':
+            return field_name
+        else:
+            return 'gbif' + field_name[0].upper() + field_name[1:]
+
 
     def _index_gbif_table(self):
         """
         For faster loading, we only add the index after records have been added
         :return:
         """
-        print 'Creating index on %s' % self.uuid_field_name
-        sql = 'ALTER TABLE {schema}.{table} ADD PRIMARY KEY ("{uuid_field_name}")'.format(
+
+        col = self._get_column_name(self.uuid_field_name)
+
+        print 'Creating index on %s' % col
+        sql = 'ALTER TABLE {schema}.{table} ADD PRIMARY KEY ("{col}")'.format(
             schema=self.pg_schema,
             table=self.pg_table,
-            uuid_field_name=self.uuid_field_name
+            col=col
         )
         self.connection.execute(sql)
-
 
     def simplify_occurrences_csv(self):
         """
@@ -171,10 +174,9 @@ class GBIFCommand(CkanCommand):
             csv_reader = csv.DictReader(f, delimiter='\t')
             csv_writer = csv.writer(open(self.outfile, 'wb'))
             # Add headers
-            csv_writer.writerow(self.field_names)
+            headers = [self._get_column_name(fn) for fn in self.field_names]
+            csv_writer.writerow(headers)
             output = []
-
-
             for row in csv_reader:
                 uuid = row.get(self.uuid_field_name, None)
                 # Ensure we have a valid UUID for this record
@@ -204,7 +206,7 @@ class GBIFCommand(CkanCommand):
         Copy the simplified CSV file to postgres
         :return:
         """
-        self._ensure_gbif_table()
+        self._create_gbif_table()
         conn = self.engine.raw_connection()
         cursor = conn.cursor()
         table = '%s.%s' % (self.pg_schema, self.pg_table)
@@ -231,119 +233,6 @@ class GBIFCommand(CkanCommand):
         # api = GBIFAPI()
         # response = api.request_download(pylons.config['ckanext.gbif.dataset_key'])
 
-        self.simplify_occurrences_csv()
-        self.copy_occurrences_csv_to_db()
+        # self.simplify_occurrences_csv()
+        # self.copy_occurrences_csv_to_db()
         self._index_gbif_table()
-
-
-
-
-
-        #
-        #
-            # fieldnames = reader.fieldnames
-            # print fieldnames
-        #     fieldnames.remove('dynamicProperties')
-        #
-        #     print outfile
-
-
-            # # Create the table
-            # self._ensure_gbif_table(fieldnames)
-            # # And load the data
-            #
-            # sql = "COPY %s FROM STDIN WITH CSV HEADER DELIMITER AS '\t'"
-            #
-            # cursor.copy_expert(sql=sql % table, file=f)
-
-            # return
-
-            # print 'Copying occurrence data to %s' % table
-            # records = []
-            # count = 0
-            # for row in reader:
-            #     records.append(row)
-            #     if len(records) > BATCH_SIZE:
-            #
-            #         sql = 'INSERT INTO {table}({cols}) VALUES ({values})'.format(
-            #                 table=table,
-            #                 cols=', '.join(['"%s"' % k for k, v in row.items() if v]),
-            #                 values=', '.join(['"%s"' % v for v in row.values() if v])
-            #             )
-            #
-            #         print sql
-
-                    # try:
-                    #     self.connection.execute(sql, records)
-                    # except StatementError, e:
-                    #     # print 'ERROR'
-                    #     raise
-                    # else:
-                    #     count += BATCH_SIZE
-                    #     print "Inserted %s" % count
-                    #     records = []
-
-
-
-            #
-            #     print sql
-
-
-
-            #     print row['occurrenceID']
-            #     print row['issue'].split(';') if row['issue'] else []
-
-
-
-
-
-    # def load_errors_from_file(self):
-    #     """
-    #     Load errors from a GBIF dataset download
-    #     @return:
-    #     """
-    #     if not self.options.file_path:
-    #         raise self.BadCommand('No filepath supplied')
-    #
-    #     resource_id = pylons.config['ckanext.gbif.resource_id']
-    #     zip_file = zipfile.ZipFile(self.options.file_path)
-    #
-    #     total = 0
-    #
-    #     with zip_file.open('occurrence.txt') as f:
-    #
-    #         # Build a list of records
-    #         records = list()
-    #
-    #         for row in csv.DictReader(f, delimiter='\t'):
-    #
-    #             # FIXME: Some records coming from GBIF are missing the OccurrenceID field
-    #             # This seems to be when the habitat field is populated (and contains a tab?)
-    #             if not row['occurrenceID']:
-    #                 continue
-    #                 print 'Missing occurrence ID'
-    #
-
-    #
-    #             records.append({
-    #                 'occurrence_id': row['occurrenceID'],
-    #                 'errors': row['issue'].split(';') if row['issue'] else [],
-    #                 'gbif_id': row['gbifID']
-    #             })
-    #
-    #             # Commit every 10000 rows
-    #             if len(records) > BATCH_SIZE:
-    #
-    #                 if not COMMIT_FROM or total > COMMIT_FROM:
-    #                     print "Updating datastore"
-    #                     tk.get_action('update_record_dqi')(self.context, {'resource_id': resource_id, 'records': records})
-    #
-    #                 # And reset the list
-    #                 records = list()
-    #
-    #                 total += BATCH_SIZE
-    #                 print total
-    #
-    #         # If we have any remaining records, save them
-    #         if records:
-    #             tk.get_action('update_record_dqi')(self.context, {'resource_id': resource_id, 'records': records})

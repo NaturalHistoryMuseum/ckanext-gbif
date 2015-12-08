@@ -2,12 +2,11 @@
 
 {% block content_primary_nav %}
 
-{{ h.build_nav_icon('record', _('Normal view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
-{{ h.build_nav_icon('dwc', _('Darwin Core view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
+    {{ super() }}
 
-{% if c.record_dict['dqi'] and c.record_dict['dqi'] != 'N/A' %}
-    {{ h.build_nav_icon('gbif', _('GBIF view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
-{% endif %}
+    {% if c.record_dict['_gbif_id'] %}
+        {{ h.build_nav_icon('gbif', _('GBIF view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
+    {% endif %}
 
 {% endblock %}
 
@@ -20,11 +19,7 @@
         </div>
 
         <div class="span4">
-
-            {% if c.record_dict['dqi'] and c.record_dict['dqi'] != 'N/A' %}
-                {% snippet "record/snippets/gbif-dqi.html", dqi=c.record_dict['dqi'], gbif_id=c.record_dict['gbif_id'] %}
-            {% endif %}
-
+            {% snippet "record/snippets/gbif-dqi.html", dqi=c.record_dict['dqi'], gbif_id=c.record_dict['_gbif_id'] %}
         </div>
 
     </div>

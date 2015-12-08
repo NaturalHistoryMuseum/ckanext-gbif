@@ -14,11 +14,8 @@ except ImportError:
     __path__ = pkgutil.extend_path(__path__, __name__)
 
 
-DQI_UNKNOWN = None
-DQI_NA = 'N/A'
 DQI_MAJOR_ERRORS = 'Major errors'
 DQI_MINOR_ERRORS = 'Minor errors'
-DQI_NO_ERRORS = 'No errors'
 
 GBIF_ERRORS = {
     'BASIS_OF_RECORD_INVALID': {

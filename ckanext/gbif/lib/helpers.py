@@ -3,44 +3,65 @@ import logging
 import os
 import dateutil.parser
 from webhelpers.html import literal
-from ckanext.gbif import GBIF_ERRORS
-
+from ckanext.gbif import GBIF_ERRORS, DQI_MAJOR_ERRORS, DQI_MINOR_ERRORS
 
 log = logging.getLogger(__name__)
 
-
-def dqi_get_status_pill(dqi_status):
+def dqi_parse_errors(dqi):
     """
     Convert a DQI status string into a class name
     @param dqi_status: Minor errors etc.,
     @return: minor-errors
     """
 
-    cls = 'dqi-{0}'.format(dqi_status.lower().replace(' ', '-'))
+    errors = []
 
-    return literal(
-        '''
-        <span title="{0}" class="dqi-pill {1}">{0}</span>
-        '''.format(dqi_status, cls))
+    try:
+        error_codes = dqi.split(';')
+    except AttributeError:
+        pass
+    else:
+        for error_code in error_codes:
+            errors.append(GBIF_ERRORS[error_code])
+    return errors
+
+def dqi_get_severity(errors, gbif_id):
+    """
+    Get class name for severity of errors
+    :param errors:
+    :param gbif_id:
+    :return:
+    """
+
+    if not gbif_id:
+        return 'unknown'
+
+    if not errors:
+        return 'No errors'
+
+    for error in errors:
+        if error['severity'] == DQI_MAJOR_ERRORS:
+            # If we have one major error, the whole thing is major error
+            return 'Major errors'
+
+    return 'Minor errors'
 
 
-def gbif_get_classification(occurrence):
+
+def gbif_get_classification(gbif_record):
     """
     Loop through all the classification parts, building an array of parts
-    @param occurrence:
+    @param gbif_record:
     @return:
     """
-
     classification = []
 
     url = 'http://www.gbif.org/species'
 
-    for classification_part in [u'kingdom', u'phylum', u'class', u'order', u'family', u'genus']:
+    for classification_part in ['gbifKingdom', 'gbifPhylum', 'gbifClass', 'gbifOrder', 'gbifFamily', 'gbifGenus']:
         key = '%sKey' % classification_part
-
-        key_value = occurrence.get(key, None)
-        name = occurrence.get(classification_part, None)
-
+        key_value = gbif_record.get(key, None)
+        name = gbif_record.get(classification_part, None)
         if key_value:
             classification.append('<a href="{href}" target="_blank" rel="nofollow">{name}</a>'.format(
                 href=os.path.join(url, str(key_value)),
@@ -53,9 +74,8 @@ def gbif_get_classification(occurrence):
 
 
 def gbif_get_geography(occurrence):
-
     geography = []
-    for geographic_part in [u'continent', u'country', u'stateProvince']:
+    for geographic_part in ['gbifContinent', 'gbifCountry', 'gbifStateProvince']:
 
         value = occurrence.get(geographic_part, None)
 
@@ -64,9 +84,11 @@ def gbif_get_geography(occurrence):
 
     return literal(' <i class="icon-angle-right"></i> '.join(geography))
 
-def gbif_get_errors():
-    return GBIF_ERRORS
-
-def gbif_format_date(date_str):
-    return dateutil.parser.parse(date_str).strftime("%B %d, %Y. %X")
+def gbif_render_datetime(date_str):
+    """
+    Render a GBIF formatted datetime
+    :param date_str:
+    :return:
+    """
+    return dateutil.parser.parse(date_str).strftime("%B %d, %Y")
 

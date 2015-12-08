@@ -1,12 +1,11 @@
+import pylons
+import logging
 import ckan.logic as logic
 import ckan.lib.base as base
 import ckan.model as model
 import ckan.plugins as p
 from ckan.common import _, c
 from ckan.plugins import toolkit as tk
-from requests import HTTPError
-from ckanext.gbif.lib.api import GBIFAPI
-import logging
 
 log = logging.getLogger(__name__)
 
@@ -18,7 +17,6 @@ NotFound = logic.NotFound
 NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 get_action = logic.get_action
-
 
 
 class GBIFController(p.toolkit.BaseController):
@@ -34,7 +32,7 @@ class GBIFController(p.toolkit.BaseController):
             c.resource = get_action('resource_show')(context, {'id': resource_id})
             c.package = get_action('package_show')(context, {'id': package_name})
             c.pkg_dict = c.package
-            record = get_action('record_get')(context, {'resource_id': resource_id, 'record_id': record_id})
+            record = get_action('record_show')(context, {'resource_id': resource_id, 'record_id': record_id})
             c.record_dict = record['data']
 
         except NotFound:
@@ -44,27 +42,20 @@ class GBIFController(p.toolkit.BaseController):
 
         occurrence_id = c.record_dict.get('occurrenceID')
 
-        c.record_title = c.record_dict.get('catalogNumber', None) or occurrence_id
-
-        # Load the gbif_id (it's a hidden field so we need to manually add it
-        sql = """SELECT _gbif_id FROM "{resource_id}" WHERE "occurrenceID"='{occurrence_id}'""".format(
-            resource_id=c.resource['id'],
-            occurrence_id=occurrence_id
-        )
-
-        try:
-            result = tk.get_action('datastore_search_sql')(context, {'sql': sql})
-            gbif_id = result['records'][0]['_gbif_id']
-        except (ValidationError, IndexError):
+        if not occurrence_id:
             abort(404, _('GBIF record not found'))
 
+        # And get the GBIF record
         try:
-            api = GBIFAPI()
-            occurrence = api.get_occurrence(gbif_id)
-        except HTTPError:
+            gbif_record = tk.get_action('gbif_record_show')(context, {
+                'occurrence_id': occurrence_id
+            })
+        except NotFound:
             abort(404, _('GBIF record not found'))
-
-        return render('record/gbif.html', {
-            'title': 'GBIF',
-            'occurrence': occurrence
-        })
+        else:
+            return render('record/gbif.html', {
+                'title': 'GBIF',
+                'gbif_record': gbif_record,
+                'organisation_key': pylons.config['ckanext.gbif.organisation_key'],
+                'dataset_key': pylons.config['ckanext.gbif.dataset_key']
+            })
