@@ -4,7 +4,7 @@
 
     {{ super() }}
 
-    {% if c.record_dict['_gbif_id'] %}
+    {% if c.record_dict['gbifID'] %}
         {{ h.build_nav_icon('gbif', _('GBIF view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
     {% endif %}
 
@@ -19,7 +19,7 @@
         </div>
 
         <div class="span4">
-            {% snippet "record/snippets/gbif-dqi.html", dqi=c.record_dict['dqi'], gbif_id=c.record_dict['_gbif_id'] %}
+            {% snippet "record/snippets/gbif-errors.html", errors=c.record_dict['gbifIssue'], gbif_id=c.record_dict['gbifID'] %}
         </div>
 
     </div>

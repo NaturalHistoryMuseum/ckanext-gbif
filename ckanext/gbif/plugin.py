@@ -11,6 +11,7 @@ from ckanext.gbif.lib.helpers import (
     gbif_render_datetime
 )
 
+
 class GBIFPlugin(p.SingletonPlugin):
     """
     GBIF plugin - Data Quality Indicators
@@ -67,11 +68,11 @@ class GBIFPlugin(p.SingletonPlugin):
         # print all_field_ids
         if resource_id == data_dict['resource_id']:
             # Add the issue field to the query
-            query_dict['select'].insert(1, 'g."gbifIssue" as dqi')
+            query_dict['select'].insert(1, '"gbifIssue"')
             # And add the GBIF ID - wen can use this in the template to check
             # if we have a GBIF record
-            query_dict['select'].append('g."gbifID" as _gbif_id')
-            query_dict['ts_query'] = 'LEFT JOIN gbif.occurrence g ON g."gbifOccurrenceID" = "%s"."occurrenceID"' % data_dict['resource_id']
+            query_dict['select'].append('"gbifID"')
+            query_dict['ts_query'] = 'LEFT JOIN gbif.occurrence ON "gbifOccurrenceID" = "occurrenceID"'
 
         # print query_dict
         return query_dict

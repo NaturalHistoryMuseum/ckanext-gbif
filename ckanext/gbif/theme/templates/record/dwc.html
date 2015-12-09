@@ -5,7 +5,7 @@
     {{ h.build_nav_icon('record', _('Normal view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
     {{ h.build_nav_icon('dwc', _('Darwin Core view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
 
-    {% if c.record_dict['_gbif_id'] %}
+    {% if c.record_dict['gbifID'] %}
         {{ h.build_nav_icon('gbif', _('GBIF view'), package_name=pkg.name, resource_id=res.id, record_id=rec._id) }}
     {% endif %}
 

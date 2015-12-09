@@ -96,8 +96,6 @@ class GBIFCommand(CkanCommand):
         if not schema_exists:
             print 'Creating schema %s' % self.pg_schema
             self.connection.execute('CREATE SCHEMA %s' % self.pg_schema)
-            # FIXME
-            # self.connection.execute('GRANT ALL ON SCHEMA foo TO staff' % self.pg_schema)
 
         # Drop table if it exists
         self.connection.execute('DROP TABLE IF EXISTS {schema}.{table}'.format(
