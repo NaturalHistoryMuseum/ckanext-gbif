@@ -116,14 +116,19 @@ class GBIFCommand(CkanCommand):
             columns=', '.join(columns),
         )
         self.connection.execute(sql)
-        # Grant access
-        self.connection.execute('GRANT USAGE ON SCHEMA {schema} TO {table}'.format(
+
+        # Get the read url username to grant permission to use schema and table
+        # Easiest way seems to be to set up a new engine object
+        read_engine = _get_engine({
+            'connection_url': pylons.config['ckan.datastore.read_url']
+        })
+        self.connection.execute('GRANT USAGE ON SCHEMA {schema} TO {username}'.format(
             schema=self.pg_schema,
-            table=self.pg_table
+            username=read_engine.url.username
         ))
-        self.connection.execute('GRANT SELECT ON ALL TABLES IN SCHEMA {schema} TO {table}'.format(
+        self.connection.execute('GRANT SELECT ON ALL TABLES IN SCHEMA {schema} TO {username}'.format(
             schema=self.pg_schema,
-            table=self.pg_table
+            username=read_engine.url.username
         ))
 
     @staticmethod
@@ -232,6 +237,6 @@ class GBIFCommand(CkanCommand):
         # FIXME - Not working
         # api = GBIFAPI()
         # response = api.request_download(pylons.config['ckanext.gbif.dataset_key'])
-        self.simplify_occurrences_csv()
+        # self.simplify_occurrences_csv()
         self.copy_occurrences_csv_to_db()
         self._index_gbif_table()
