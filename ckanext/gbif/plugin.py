@@ -63,7 +63,7 @@ class GBIFPlugin(p.SingletonPlugin):
     ## IDataStore
     def datastore_search(self, context, data_dict, all_field_ids, query_dict):
 
-        resource_id = pylons.config['ckanext.gbif.resource_id']
+        resource_id = pylons.config['ckanext.nhm.specimen_resource_id']
 
         # print all_field_ids
         if resource_id == data_dict['resource_id']:
