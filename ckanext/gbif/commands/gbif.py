@@ -1,4 +1,5 @@
 
+import os
 import logging
 import pylons
 import ckan.logic as logic
@@ -17,11 +18,7 @@ NotFound = logic.NotFound
 NotAuthorized = logic.NotAuthorized
 ValidationError = logic.ValidationError
 
-
-GBIF_ARCHIVE = '/Users/bens3/Downloads/0017401-151016162008034.zip'
 BATCH_SIZE = 10000
-
-# FIXME: publishingOrgKey missing
 
 class GBIFCommand(CkanCommand):
     """
@@ -166,7 +163,12 @@ class GBIFCommand(CkanCommand):
         Which our dynamicProperties have, and which breaks copy to postgres
         :return:
         """
-        zip_file = zipfile.ZipFile(GBIF_ARCHIVE)
+
+        gbif_archive_file = pylons.config['ckanext.gbif.archive_file']
+
+        if not os.path.isfile(gbif_archive_file):
+            raise IOError('GBIF archive does not exist: %s' % gbif_archive_file)
+        zip_file = zipfile.ZipFile(gbif_archive_file)
         count = 0
         with zip_file.open('occurrence.txt') as f:
             csv_reader = csv.DictReader(f, delimiter='\t')
@@ -230,7 +232,6 @@ class GBIFCommand(CkanCommand):
         # FIXME - Not working
         # api = GBIFAPI()
         # response = api.request_download(pylons.config['ckanext.gbif.dataset_key'])
-
-        # self.simplify_occurrences_csv()
-        # self.copy_occurrences_csv_to_db()
+        self.simplify_occurrences_csv()
+        self.copy_occurrences_csv_to_db()
         self._index_gbif_table()
