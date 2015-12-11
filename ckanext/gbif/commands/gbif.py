@@ -205,7 +205,6 @@ class GBIFCommand(CkanCommand):
                     count+=BATCH_SIZE
                     print count
 
-
     def copy_occurrences_csv_to_db(self):
         """
         Copy the simplified CSV file to postgres
@@ -237,6 +236,7 @@ class GBIFCommand(CkanCommand):
         # FIXME - Not working
         # api = GBIFAPI()
         # response = api.request_download(pylons.config['ckanext.gbif.dataset_key'])
-        # self.simplify_occurrences_csv()
+
+        self.simplify_occurrences_csv()
         self.copy_occurrences_csv_to_db()
         self._index_gbif_table()
