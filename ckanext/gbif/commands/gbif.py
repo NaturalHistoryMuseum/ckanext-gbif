@@ -274,6 +274,9 @@ class GBIFCommand(CkanCommand):
 
         :return:
         """
+
+        print('Running GBIF:Load dataset')
+
         gbif_dataset_uuid = pylons.config['ckanext.gbif.dataset_key']
         archive_dir = pylons.config['ckanext.gbif.import_dir']
 

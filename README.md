@@ -14,22 +14,20 @@ The GBIF dataset download is received via email, so the GBIF download needs to b
  
 
 Run paster gbif load-dataset -c [path to config]
- 
- 
-CRON
-==== 
-
-The command is run weekly as a cron job.
-
-paster gbif load-dataset -c [path to config]
 
 e.g. On Live:
 
 paster gbif load-dataset -c /etc/ckan/default/development.ini
 
-
 If a recent GBIF dataset download cannot be found in the import directory (setting ckanext.gbif.import_dir), a warning email will be sent to pylons.config.get('email_to') (currently data@data.nhm.ac.uk). 
+ 
+ 
+CRON
+==== 
 
+The command is run weekly, at 11am on Monday.
+
+* 11 * * 1 /usr/lib/ckan/default/bin/paster --plugin=ckanext-gbif gbif load-dataset -c /etc/ckan/default/development.ini > /var/log/gbif.log 2>&1
 
 
 Dependencies
