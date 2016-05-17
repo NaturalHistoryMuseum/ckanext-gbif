@@ -270,14 +270,7 @@ class GBIFCommand(CkanCommand):
 
     def load_dataset(self):
         """
-        Load the GBIF Dataset, and upload it to the Data Portal
-
-        Performs a number of checks before running the import, and sends an alert to pylons.config.get('email_to')
-
-            1. If there is no GBIF export file
-
-
-        Request data
+        Loads the GBIF Dataset into the CKAN Datastore
 
         :return:
         """
@@ -306,6 +299,7 @@ class GBIFCommand(CkanCommand):
 
         # We do not have a GBIF dump file to import
         if not files:
+            log.error('No GBIF export file to import')
             err = """
             There is no GBIF export file to import.
 
@@ -325,6 +319,7 @@ class GBIFCommand(CkanCommand):
 
         # If the newest file is the last one processed, see if we have a more recent GBIF dataset to download
         if ctime == last_runtime and dataset_published_date > datetime.datetime.fromtimestamp(last_runtime, pytz.UTC):
+            log.error('Newer version of GBIF data to import. Please download from GBIF.')
             err = """
             There is newer version of GBIF data to import.
 
