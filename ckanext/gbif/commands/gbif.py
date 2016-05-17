@@ -42,7 +42,7 @@ class GBIFCommand(CkanCommand):
 
     pg_schema = 'gbif'
     pg_table = 'occurrence'
-    last_runtime_file = '.log'
+    last_runtime_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.log')
     uuid_field_name = 'occurrenceID'
     # The GBIF field names we want to keep
     field_names = [
@@ -274,7 +274,6 @@ class GBIFCommand(CkanCommand):
 
         :return:
         """
-
         gbif_dataset_uuid = pylons.config['ckanext.gbif.dataset_key']
         archive_dir = pylons.config['ckanext.gbif.import_dir']
 
@@ -340,9 +339,9 @@ class GBIFCommand(CkanCommand):
             return
 
         # Process the file, importing into the Data Portal
-        self._simplify_occurrences_csv(newest_file)
-        self._copy_occurrences_csv_to_db()
-        self._index_gbif_table()
+        # self._simplify_occurrences_csv(newest_file)
+        # self._copy_occurrences_csv_to_db()
+        # self._index_gbif_table()
 
         # ANd set the last runtime, so when run on cron
         self._set_last_runtime(ctime)
