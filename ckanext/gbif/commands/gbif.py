@@ -1,6 +1,8 @@
 
 import os
-import logging
+import time
+import glob
+import logging, logging.handlers
 import pylons
 import ckan.logic as logic
 import zipfile
@@ -11,8 +13,12 @@ from ckanext.datastore.db import _get_engine
 from uuid import UUID
 from ckanext.gbif.lib.api import GBIFAPI
 from sqlalchemy.exc import StatementError
+import ckan.lib.mailer as mailer
+from dateutil import parser
+import datetime
+import pytz
 
-log = logging.getLogger(__name__)
+log = logging.getLogger()
 
 NotFound = logic.NotFound
 NotAuthorized = logic.NotAuthorized
@@ -36,6 +42,7 @@ class GBIFCommand(CkanCommand):
 
     pg_schema = 'gbif'
     pg_table = 'occurrence'
+    last_runtime_file = '.log'
     uuid_field_name = 'occurrenceID'
     # The GBIF field names we want to keep
     field_names = [
@@ -161,15 +168,13 @@ class GBIFCommand(CkanCommand):
         )
         self.connection.execute(sql)
 
-    def simplify_occurrences_csv(self):
+    def _simplify_occurrences_csv(self, gbif_archive_file):
         """
         Create a simplified CSV of occurrences data
         The data from GBIF isn't usable if it contains JSON data with quotes
         Which our dynamicProperties have, and which breaks copy to postgres
         :return:
         """
-
-        gbif_archive_file = pylons.config['ckanext.gbif.archive_file']
 
         if not os.path.isfile(gbif_archive_file):
             raise IOError('GBIF archive does not exist: %s' % gbif_archive_file)
@@ -190,7 +195,7 @@ class GBIFCommand(CkanCommand):
                     continue
                 else:
                     # Ensure the Occurrence ID is a valid UUID
-                    # TODO: Parsing CSV is mising up fields if they have a tab in them
+                    # TODO: Parsing CSV is messing up fields if they have a tab in them
                     try:
                         UUID(row[self.uuid_field_name], version=4)
                     except ValueError:
@@ -205,7 +210,7 @@ class GBIFCommand(CkanCommand):
                     count+=BATCH_SIZE
                     print count
 
-    def copy_occurrences_csv_to_db(self):
+    def _copy_occurrences_csv_to_db(self):
         """
         Copy the simplified CSV file to postgres
         :return:
@@ -220,23 +225,129 @@ class GBIFCommand(CkanCommand):
             cursor.copy_expert(sql=sql, file=f)
             conn.commit()
 
+
+    def _error_notification(self, err):
+        """
+        Send email notification that an action is required
+        :return:
+        """
+
+        body = '{0}\n\nMany thanks,\nData Portal Bot'.format(err)
+
+        mail_dict = {
+            'recipient_email': pylons.config.get('email_to'),
+            'recipient_name': pylons.config.get('ckanext.contact.recipient_name') or pylons.config.get('ckan.site_title'),
+            'sender_name': pylons.config.get('ckan.site_title'),
+            'sender_url': pylons.config.get('ckan.site_url'),
+            'subject': 'GBIF Import Error',
+            'body': body,
+            'headers': {'reply-to': 'no-reply'}
+        }
+
+        mailer._mail_recipient(**mail_dict)
+
+    def _get_last_runtime(self):
+        """
+        Get timestamp of last import
+        :return:
+        """
+        try:
+            with open(self.last_runtime_file, 'r') as f:
+                runtime = f.readline()
+                return float(runtime)
+        except IOError:
+            # If the file doesn't exist, last runtime is None
+            return None
+
+    def _set_last_runtime(self, runtime):
+        """
+       Set timestamp of last import (using the file ctime)
+        :return:
+        """
+        with open(self.last_runtime_file, 'w') as f:
+            f.write(str(runtime))
+
+
     def load_dataset(self):
         """
-        Load the GBIF Dataset
+        Load the GBIF Dataset, and upload it to the Data Portal
+
+        Performs a number of checks before running the import, and sends an alert to pylons.config.get('email_to')
+
+            1. If there is no GBIF export file
+
 
         Request data
 
         :return:
         """
 
-        # TODO:
-        # resource_id = pylons.config['ckanext.gbif.resource_id']
-        # resource = tk.get_action('resource_show')(self.context, {'id': resource_id})
+        gbif_dataset_uuid = pylons.config['ckanext.gbif.dataset_key']
+        archive_dir = pylons.config['ckanext.gbif.import_dir']
 
-        # FIXME - Not working
-        # api = GBIFAPI()
-        # response = api.request_download(pylons.config['ckanext.gbif.dataset_key'])
+        # Get the current GBIF ID
+        api = GBIFAPI()
+        dataset = api.get_dataset(gbif_dataset_uuid)
 
-        self.simplify_occurrences_csv()
-        self.copy_occurrences_csv_to_db()
+        # Get the date the last dataset was published
+        dataset_published_date = parser.parse(dataset['pubDate'])
+
+        # Get the last time the GBIF import was run
+        last_runtime = self._get_last_runtime()
+
+        # If the GBIF published date isn't more recent than the last runtime
+        # There is no need to re-import
+        if last_runtime and dataset_published_date < datetime.datetime.fromtimestamp(last_runtime, pytz.UTC):
+            print('GBIF dataset has not been updated since last run. Exiting')
+            return
+
+        # Try and file potential GBIF import files
+        files = glob.glob(os.path.join(archive_dir, '*-*.zip'))
+
+        # We do not have a GBIF dump file to import
+        if not files:
+            err = """
+            There is no GBIF export file to import.
+
+            Please download a new export of Natural History Records from GBIF (http://www.gbif.org/occurrence/search?datasetKey={gbif_dataset_uuid}) and upload it to {archive_dir}.
+
+            """.format(
+                gbif_dataset_uuid=gbif_dataset_uuid,
+                archive_dir=archive_dir
+            )
+
+            self._error_notification(err)
+            return
+
+        # Ensure we're using the newest file
+        newest_file = max(files, key=os.path.getctime)
+        ctime = os.path.getctime(newest_file)
+
+        # If the newest file is the last one processed, see if we have a more recent GBIF dataset to download
+        if ctime == last_runtime and dataset_published_date > datetime.datetime.fromtimestamp(last_runtime, pytz.UTC):
+            err = """
+            There is newer version of GBIF data to import.
+
+            The most recent available import file ({newest_file}) was created on {newest_file_ts}.
+            The NHM dataset on GBIF was updated on {dataset_published_date}.
+
+            Please download a new export of Natural History Records from GBIF (http://www.gbif.org/occurrence/search?datasetKey={gbif_dataset_uuid}) and upload it to {archive_dir}/.
+
+            """.format(
+                newest_file=newest_file,
+                newest_file_ts=datetime.datetime.fromtimestamp(ctime, pytz.UTC),
+                dataset_published_date=dataset_published_date,
+                gbif_dataset_uuid=gbif_dataset_uuid,
+                archive_dir=archive_dir
+            )
+
+            self._error_notification(err)
+            return
+
+        # Process the file, importing into the Data Portal
+        self._simplify_occurrences_csv(newest_file)
+        self._copy_occurrences_csv_to_db()
         self._index_gbif_table()
+
+        # ANd set the last runtime, so when run on cron
+        self._set_last_runtime(ctime)

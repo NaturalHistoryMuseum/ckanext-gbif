@@ -74,5 +74,4 @@ class GBIFPlugin(p.SingletonPlugin):
             query_dict['select'].append('"gbifID"')
             query_dict['ts_query'] = 'LEFT JOIN gbif.occurrence ON "gbifOccurrenceID" = "occurrenceID"'
 
-        # print query_dict
         return query_dict

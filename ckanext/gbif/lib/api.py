@@ -15,25 +15,10 @@ GBIF_ENDPOINT = 'http://api.gbif.org/v1'
 
 class GBIFAPI():
 
-    def __init__(self):
-        self.auth = (config['ckanext.gbif.username'], config['ckanext.gbif.password'])
-
-    def request_download(self, dataset_key):
-        path = '/occurrence/download/request'
-        params = {
-            "creator": config['ckanext.gbif.username'],
-            "notification_address": ["ben@benscott.co.uk"],
-            "predicate":
-                {
-                    "type": "equals",
-                    "key": "datasetKey",
-                    "value": dataset_key
-                }
-        }
-
-        r = requests.post(GBIF_ENDPOINT + path, json=params, auth=self.auth)
+    def get_dataset(self, uuid):
+        url = os.path.join(GBIF_ENDPOINT, 'dataset', uuid)
+        r = requests.get(url)
         r.raise_for_status()
-
-        # Return the result
         return r.json()
+
 
