@@ -3,7 +3,7 @@ import logging
 import os
 import dateutil.parser
 from webhelpers.html import literal
-from ckanext.gbif import GBIF_ERRORS, DQI_MAJOR_ERRORS, DQI_MINOR_ERRORS
+from ckanext.gbif.lib.errors import GBIF_ERRORS, DQI_MAJOR_ERRORS, DQI_MINOR_ERRORS
 
 log = logging.getLogger(__name__)
 
