@@ -1,4 +1,3 @@
-
 import os
 import time
 import glob
@@ -26,6 +25,7 @@ ValidationError = logic.ValidationError
 
 BATCH_SIZE = 10000
 
+
 class GBIFCommand(CkanCommand):
     """
 
@@ -43,6 +43,7 @@ class GBIFCommand(CkanCommand):
     pg_schema = 'gbif'
     pg_table = 'occurrence'
     last_runtime_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.log')
+    print(last_runtime_file)
     uuid_field_name = 'occurrenceID'
     # The GBIF field names we want to keep
     field_names = [
@@ -51,7 +52,8 @@ class GBIFCommand(CkanCommand):
         'occurrenceID', 'lastInterpreted', 'lastParsed',
         'issue',
         # Classification
-        'kingdom', 'kingdomKey', 'phylum', 'phylumKey', 'class', 'classKey', 'order', 'orderKey', 'family', 'familyKey', 'genus', 'genusKey', 'subgenus', 'subgenusKey', 'species', 'speciesKey', 'taxonRank',
+        'kingdom', 'kingdomKey', 'phylum', 'phylumKey', 'class', 'classKey', 'order', 'orderKey', 'family', 'familyKey', 'genus', 'genusKey', 'subgenus', 'subgenusKey', 'species', 'speciesKey',
+        'taxonRank',
         # Identification
         'identifiedBy', 'scientificName', 'taxonKey',
         # Collection event
@@ -85,6 +87,8 @@ class GBIFCommand(CkanCommand):
         self.context = {'user': user['name']}
         cmd = self.args[0]
         if cmd == 'load-dataset':
+            self._create_gbif_table()
+            print('Load')
             self.load_dataset()
         else:
             print 'Command %s not recognized' % cmd
@@ -100,6 +104,8 @@ class GBIFCommand(CkanCommand):
         if not schema_exists:
             print 'Creating schema %s' % self.pg_schema
             self.connection.execute('CREATE SCHEMA %s' % self.pg_schema)
+            self.connection.execute('GRANT USAGE ON SCHEMA %s TO datastore_default' % self.pg_schema)
+            self.connection.execute('GRANT SELECT ON ALL TABLES IN SCHEMA %s TO datastore_default' % self.pg_schema)
 
         # Drop table if it exists
         self.connection.execute('DROP TABLE IF EXISTS {schema}.{table}'.format(
@@ -150,7 +156,6 @@ class GBIFCommand(CkanCommand):
             return field_name
         else:
             return 'gbif' + field_name[0].upper() + field_name[1:]
-
 
     def _index_gbif_table(self):
         """
@@ -207,7 +212,7 @@ class GBIFCommand(CkanCommand):
                 if len(output) > BATCH_SIZE:
                     csv_writer.writerows(output)
                     output = []
-                    count+=BATCH_SIZE
+                    count += BATCH_SIZE
                     print count
 
     def _copy_occurrences_csv_to_db(self):
@@ -224,7 +229,6 @@ class GBIFCommand(CkanCommand):
         with open(self.outfile) as f:
             cursor.copy_expert(sql=sql, file=f)
             conn.commit()
-
 
     def _error_notification(self, err):
         """
@@ -266,7 +270,6 @@ class GBIFCommand(CkanCommand):
         """
         with open(self.last_runtime_file, 'w') as f:
             f.write(str(runtime))
-
 
     def load_dataset(self):
         """
@@ -342,9 +345,10 @@ class GBIFCommand(CkanCommand):
             return
 
         # Process the file, importing into the Data Portal
-        # self._simplify_occurrences_csv(newest_file)
-        # self._copy_occurrences_csv_to_db()
-        # self._index_gbif_table()
+        self._create_gbif_table()
+        self._simplify_occurrences_csv(newest_file)
+        self._copy_occurrences_csv_to_db()
+        self._index_gbif_table()
 
         # ANd set the last runtime, so when run on cron
         self._set_last_runtime(ctime)
