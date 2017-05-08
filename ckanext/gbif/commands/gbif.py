@@ -43,7 +43,6 @@ class GBIFCommand(CkanCommand):
     pg_schema = 'gbif'
     pg_table = 'occurrence'
     last_runtime_file = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.log')
-    print(last_runtime_file)
     uuid_field_name = 'occurrenceID'
     # The GBIF field names we want to keep
     field_names = [
@@ -90,6 +89,8 @@ class GBIFCommand(CkanCommand):
             self._create_gbif_table()
             print('Load')
             self.load_dataset()
+        elif cmd == 'create-table':
+            self._create_gbif_table()
         else:
             print 'Command %s not recognized' % cmd
 
@@ -102,10 +103,7 @@ class GBIFCommand(CkanCommand):
 
         schema_exists = self.connection.execute("SELECT 1 FROM information_schema.schemata WHERE schema_name = '%s'" % self.pg_schema).scalar()
         if not schema_exists:
-            print 'Creating schema %s' % self.pg_schema
-            self.connection.execute('CREATE SCHEMA %s' % self.pg_schema)
-            self.connection.execute('GRANT USAGE ON SCHEMA %s TO datastore_default' % self.pg_schema)
-            self.connection.execute('GRANT SELECT ON ALL TABLES IN SCHEMA %s TO datastore_default' % self.pg_schema)
+            raise Exception('Schema %s does not exist' % self.pg_schema)
 
         # Drop table if it exists
         self.connection.execute('DROP TABLE IF EXISTS {schema}.{table}'.format(
@@ -130,19 +128,20 @@ class GBIFCommand(CkanCommand):
         )
         self.connection.execute(sql)
 
-        # Get the read url username to grant permission to use schema and table
-        # Easiest way seems to be to set up a new engine object
-        read_engine = _get_engine({
-            'connection_url': pylons.config['ckan.datastore.read_url']
-        })
-        self.connection.execute('GRANT USAGE ON SCHEMA {schema} TO {username}'.format(
-            schema=self.pg_schema,
-            username=read_engine.url.username
-        ))
-        self.connection.execute('GRANT SELECT ON ALL TABLES IN SCHEMA {schema} TO {username}'.format(
-            schema=self.pg_schema,
-            username=read_engine.url.username
-        ))
+        #
+        # # Get the read url username to grant permission to use schema and table
+        # # Easiest way seems to be to set up a new engine object
+        # read_engine = _get_engine({
+        #     'connection_url': pylons.config['ckan.datastore.read_url']
+        # })
+        # self.connection.execute('GRANT USAGE ON SCHEMA {schema} TO {username}'.format(
+        #     schema=self.pg_schema,
+        #     username=read_engine.url.username
+        # ))
+        # self.connection.execute('GRANT SELECT ON ALL TABLES IN SCHEMA {schema} TO {username}'.format(
+        #     schema=self.pg_schema,
+        #     username=read_engine.url.username
+        # ))
 
     @staticmethod
     def _get_column_name(field_name):
