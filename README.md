@@ -22,6 +22,10 @@ paster gbif load-dataset -c /etc/ckan/default/development.ini
 If a recent GBIF dataset download cannot be found in the import directory (setting ckanext.gbif.import_dir), a warning email will be sent to pylons.config.get('email_to') (currently data@data.nhm.ac.uk). 
  
  
+Create tables only:
+ 
+paster gbif create-table -c /etc/ckan/default/development.ini 
+ 
 CRON
 ==== 
 
