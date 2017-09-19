@@ -17,9 +17,9 @@
 
         {% set classification = h.gbif_get_classification(gbif_record) %}
 
-        {% set errors = h.dqi_parse_errors(gbif_record['gbifIssue']) %}
+        {% set errors = h.dqi_parse_errors(gbif_record['issue']) %}
 
-        {% if classification or gbif_record['gbifSpeciesKey'] or gbif_record['gbifIdentifiedBy'] %}
+        {% if classification or gbif_record['specieskey'] or gbif_record['identifiedby'] %}
 
             <thead>
                 <tr>
@@ -29,12 +29,12 @@
             </thead>
             <tbody>
 
-                {% if gbif_record['gbifSpeciesKey'] %}
+                {% if gbif_record['specieskey'] %}
 
                     <tr>
                         <td><strong>Identified as species</strong></td>
                         <td>
-                            <a href="http://www.gbif.org/species/{{ gbif_record['gbifSpeciesKey'] }}" target="_blank" rel="nofollow">{{ gbif_record['gbifScientificName'] }}</a>
+                            <a href="http://www.gbif.org/species/{{ gbif_record['specieskey'] }}" target="_blank" rel="nofollow">{{ gbif_record['gbifScientificName'] }}</a>
                         </td>
                     </tr>
 
@@ -51,12 +51,12 @@
 
                 {% endif %}
 
-                {% if gbif_record['gbifIdentifiedBy'] %}
+                {% if gbif_record['identifiedby'] %}
 
                     <tr>
                         <td><strong>Identified</strong></td>
                         <td>
-                            {{ gbif_record['gbifIdentifiedBy'] }}
+                            {{ gbif_record['identifiedby'] }}
                         </td>
                     </tr>
 
@@ -68,7 +68,7 @@
 
         {# Occurrence details #}
 
-        {% if gbif_record['gbifRecordedBy'] or gbif_record['gbifEventDate'] or gbif_record['gbifRecordNumber'] %}
+        {% if gbif_record['recordedby'] or gbif_record['eventdate'] or gbif_record['recordnumber'] %}
 
             <thead>
                 <tr>
@@ -77,30 +77,30 @@
             </thead>
             <tbody>
 
-                {% if gbif_record['gbifRecordedBy'] %}
+                {% if gbif_record['recordedby'] %}
 
                     <tr>
                         <td><strong>Recorded by</strong></td>
-                        <td>{{ gbif_record['gbifRecordedBy'] }}</td>
+                        <td>{{ gbif_record['recordedby'] }}</td>
                     </tr>
 
                 {% endif %}
 
-                {% if gbif_record['gbifEventDate'] %}
+                {% if gbif_record['eventdate'] %}
 
                     <tr>
                         <td><strong>Date recorded</strong></td>
-                        <td>{{ gbif_record['gbifEventDate'] }}</td>
+                        <td>{{ gbif_record['eventdate'] }}</td>
                     </tr>
 
                 {% endif %}
 
 
-                {% if gbif_record['gbifRecordNumber'] %}
+                {% if gbif_record['recordnumber'] %}
 
                     <tr>
                         <td><strong>Record number</strong></td>
-                        <td>{{ gbif_record['gbifRecordNumber'] }}</td>
+                        <td>{{ gbif_record['recordnumber'] }}</td>
                     </tr>
 
                 {% endif %}
@@ -113,7 +113,7 @@
 
         {% set geography = h.gbif_get_geography(gbif_record) %}
 
-        {% if geography or gbif_record['gbifHabitat'] or gbif_record['gbifCountryCode'] or gbif_record['gbifIslandGroup'] or (gbif_record['gbifDecimalLongitude'] and gbif_record['gbifDecimalLatitude']) %}
+        {% if geography or gbif_record['habitat'] or gbif_record['countrycode'] or gbif_record['islandgroup'] or (gbif_record['decimallongitude'] and gbif_record['decimallatitude']) %}
 
             <thead>
                 <tr>
@@ -122,20 +122,20 @@
             </thead>
             <tbody>
 
-                {% if gbif_record['gbifCountryCode'] %}
+                {% if gbif_record['countrycode'] %}
 
                     <tr>
                         <td><strong>Country</strong></td>
-                        <td><a href="http://www.gbif.org/country/{{ gbif_record['gbifCountryCode'] }}" target="_blank" rel="nofollow">{{ gbif_record['country'] or gbif_record['gbifCountryCode'] }}</a></td>
+                        <td><a href="http://www.gbif.org/country/{{ gbif_record['countrycode'] }}" target="_blank" rel="nofollow">{{ gbif_record['country'] or gbif_record['countrycode'] }}</a></td>
                     </tr>
 
                 {% endif %}
 
-                {% if gbif_record['gbifDecimalLongitude'] and gbif_record['gbifDecimalLatitude'] %}
+                {% if gbif_record['decimallongitude'] and gbif_record['decimallatitude'] %}
 
                     <tr>
                         <td><strong>Coordinates</strong></td>
-                        <td><a href="http://www.gbif.org/gbif_record/{{ gbif_record['gbifID'] }}#map" target="_blank" rel="nofollow">{{ gbif_record['gbifDecimalLongitude'] }}, {{ gbif_record['gbifDecimalLatitude'] }}</a></td>
+                        <td><a href="http://www.gbif.org/gbif_record/{{ gbif_record['id'] }}#map" target="_blank" rel="nofollow">{{ gbif_record['decimallongitude'] }}, {{ gbif_record['decimallatitude'] }}</a></td>
                     </tr>
 
                 {% endif %}
@@ -151,20 +151,20 @@
 
                 {% endif %}
 
-                {% if gbif_record['gbifIslandGroup'] %}
+                {% if gbif_record['islandgroup'] %}
 
                     <tr>
                         <td><strong>Islands</strong></td>
-                        <td>{{ gbif_record['gbifIslandGroup'] }}</td>
+                        <td>{{ gbif_record['islandgroup'] }}</td>
                     </tr>
 
                 {% endif %}
 
-                {% if gbif_record['gbifHabitat'] %}
+                {% if gbif_record['habitat'] %}
 
                     <tr>
                         <td><strong>Habitat</strong></td>
-                        <td>{{ gbif_record['gbifHabitat'] }}</td>
+                        <td>{{ gbif_record['habitat'] }}</td>
                     </tr>
 
                 {% endif %}
@@ -206,17 +206,12 @@
 
             <tr>
                 <td><strong>Last interpreted</strong></td>
-                <td>{{ h.gbif_render_datetime(gbif_record['gbifLastInterpreted']) }}</td>
-            </tr>
-
-            <tr>
-                <td><strong>Last parsed</strong></td>
-                <td>{{ h.gbif_render_datetime(gbif_record['gbifLastParsed']) }}</td>
+                <td>{{ h.gbif_render_datetime(gbif_record['lastinterpreted']) }}</td>
             </tr>
 
             <tr>
                 <td><strong>Occurrence</strong></td>
-                <td><a href="http://www.gbif.org/occurrence/{{ gbif_record['gbifID'] }}" target="_blank" rel="nofollow">{{ gbif_record['gbifID'] }}</a></td>
+                <td><a href="http://www.gbif.org/occurrence/{{ gbif_record['id'] }}" target="_blank" rel="nofollow">{{ gbif_record['id'] }}</a></td>
             </tr>
 
             <tr>

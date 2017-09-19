@@ -19,7 +19,7 @@
         </div>
 
         <div class="span4">
-            {% snippet "record/snippets/gbif-errors.html", errors=c.record_dict['gbifIssue'], gbif_id=c.record_dict['gbifID'] %}
+            {% snippet "record/snippets/gbif-errors.html", errors=c.record_dict.get('gbifIssue', None), gbif_id=c.record_dict.get('gbifID', None) %}
         </div>
 
     </div>

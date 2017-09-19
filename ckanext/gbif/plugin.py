@@ -24,7 +24,6 @@ class GBIFPlugin(p.SingletonPlugin):
 
     ## IConfigurer
     def update_config(self, config):
-
         # Add template directory - we manually add to extra_template_paths
         # rather than using add_template_directory to ensure it is always used
         # to override templates
@@ -35,23 +34,21 @@ class GBIFPlugin(p.SingletonPlugin):
 
     ## IRoutes
     def before_map(self, map):
-
         # Add GBIF record view
         map.connect('gbif', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/gbif',
-            controller='ckanext.gbif.controllers.gbif:GBIFController',
-            action='view'
-        )
+                    controller='ckanext.gbif.controllers.gbif:GBIFController',
+                    action='view'
+                    )
 
         return map
 
     def get_actions(self):
         return {
-            'gbif_record_show':  gbif_record_show
+            'gbif_record_show': gbif_record_show
         }
 
     # ITemplateHelpers
     def get_helpers(self):
-
         return {
             'dqi_get_severity': dqi_get_severity,
             'dqi_parse_errors': dqi_parse_errors,
@@ -59,19 +56,3 @@ class GBIFPlugin(p.SingletonPlugin):
             'gbif_get_geography': gbif_get_geography,
             'gbif_render_datetime': gbif_render_datetime
         }
-
-    ## IDataStore
-    def datastore_search(self, context, data_dict, all_field_ids, query_dict):
-
-        resource_id = pylons.config['ckanext.nhm.specimen_resource_id']
-
-        # print all_field_ids
-        if resource_id == data_dict['resource_id']:
-            # Add the issue field to the query
-            query_dict['select'].insert(1, '"gbifIssue"')
-            # And add the GBIF ID - wen can use this in the template to check
-            # if we have a GBIF record
-            query_dict['select'].append('"gbifID"')
-            query_dict['ts_query'] = 'LEFT JOIN gbif.occurrence ON "gbifOccurrenceID" = "occurrenceID"'
-
-        return query_dict

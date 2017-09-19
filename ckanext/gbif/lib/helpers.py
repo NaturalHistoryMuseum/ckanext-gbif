@@ -1,4 +1,3 @@
-
 import logging
 import os
 import dateutil.parser
@@ -6,6 +5,7 @@ from webhelpers.html import literal
 from ckanext.gbif.lib.errors import GBIF_ERRORS, DQI_MAJOR_ERRORS, DQI_MINOR_ERRORS
 
 log = logging.getLogger(__name__)
+
 
 def dqi_parse_errors(dqi):
     """
@@ -15,7 +15,6 @@ def dqi_parse_errors(dqi):
     """
 
     errors = []
-
     try:
         error_codes = dqi.split(';')
     except AttributeError:
@@ -24,6 +23,7 @@ def dqi_parse_errors(dqi):
         for error_code in error_codes:
             errors.append(GBIF_ERRORS[error_code])
     return errors
+
 
 def dqi_get_severity(errors, gbif_id):
     """
@@ -47,7 +47,6 @@ def dqi_get_severity(errors, gbif_id):
     return 'Minor errors'
 
 
-
 def gbif_get_classification(gbif_record):
     """
     Loop through all the classification parts, building an array of parts
@@ -57,9 +56,8 @@ def gbif_get_classification(gbif_record):
     classification = []
 
     url = 'http://www.gbif.org/species'
-
-    for classification_part in ['gbifKingdom', 'gbifPhylum', 'gbifClass', 'gbifOrder', 'gbifFamily', 'gbifGenus']:
-        key = '%sKey' % classification_part
+    for classification_part in ['kingdom', 'phylum', 'class', 'taxonorder', 'family', 'genus']:
+        key = '%skey' % classification_part
         key_value = gbif_record.get(key, None)
         name = gbif_record.get(classification_part, None)
         if key_value:
@@ -75,7 +73,7 @@ def gbif_get_classification(gbif_record):
 
 def gbif_get_geography(occurrence):
     geography = []
-    for geographic_part in ['gbifContinent', 'gbifCountry', 'gbifStateProvince']:
+    for geographic_part in ['continent', 'country', 'stateprovince']:
 
         value = occurrence.get(geographic_part, None)
 
@@ -84,6 +82,7 @@ def gbif_get_geography(occurrence):
 
     return literal(' <i class="icon-angle-right"></i> '.join(geography))
 
+
 def gbif_render_datetime(date_str):
     """
     Render a GBIF formatted datetime
@@ -91,4 +90,3 @@ def gbif_render_datetime(date_str):
     :return:
     """
     return dateutil.parser.parse(date_str).strftime("%B %d, %Y")
-
