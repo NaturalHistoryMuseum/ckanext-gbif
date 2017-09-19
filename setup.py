@@ -22,8 +22,5 @@ setup(
 	"""
         [ckan.plugins]
             gbif = ckanext.gbif.plugin:GBIFPlugin
-
-	    [paste.paster_command]
-            gbif=ckanext.gbif.commands.gbif:GBIFCommand
 	""",
 )
