@@ -10,14 +10,14 @@ log = logging.getLogger(__name__)
 def dqi_parse_errors(dqi):
     """
     Convert a DQI status string into a class name
-    @param dqi_status: Minor errors etc.,
+    @param dqi: Minor errors etc.,
     @return: minor-errors
     """
 
     errors = []
     try:
-        error_codes = dqi.split(';')
-    except AttributeError:
+        error_codes = dqi[0].split(';')
+    except (AttributeError, TypeError):
         pass
     else:
         for error_code in error_codes:
