@@ -15,8 +15,10 @@ def dqi_parse_errors(dqi):
     """
 
     errors = []
+    # BS: Hacky bug fix - DQIs are passed in as a list on record view, but not on GBIF page!
+    dqi = dqi[0] if isinstance(dqi, list) else dqi
     try:
-        error_codes = dqi[0].split(';')
+        error_codes = dqi.split(';')
     except (AttributeError, TypeError):
         pass
     else:
