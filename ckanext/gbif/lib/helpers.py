@@ -5,10 +5,11 @@
 # Created by the Natural History Museum in London, UK
 
 import logging
-import os
+
 import dateutil.parser
+import os
+from ckanext.gbif.lib.errors import DQI_MAJOR_ERRORS, GBIF_ERRORS
 from webhelpers.html import literal
-from ckanext.gbif.lib.errors import GBIF_ERRORS, DQI_MAJOR_ERRORS, DQI_MINOR_ERRORS
 
 log = logging.getLogger(__name__)
 
@@ -22,7 +23,8 @@ def dqi_parse_errors(dqi):
     '''
 
     errors = []
-    # BS: Hacky bug fix - DQIs are passed in as a list on record view, but not on GBIF page!
+    # BS: Hacky bug fix - DQIs are passed in as a list on record view, but not on GBIF
+    #  page!
     dqi = dqi[0] if isinstance(dqi, list) else dqi
     try:
         error_codes = dqi.split(u';')
@@ -65,15 +67,17 @@ def gbif_get_classification(gbif_record):
     classification = []
 
     url = u'http://www.gbif.org/species'
-    for classification_part in [u'kingdom', u'phylum', u'class', u'taxonorder', u'family', u'genus']:
+    for classification_part in [u'kingdom', u'phylum', u'class', u'taxonorder',
+                                u'family', u'genus']:
         key = u'%skey' % classification_part
         key_value = gbif_record.get(key, None)
         name = gbif_record.get(classification_part, None)
         if key_value:
-            classification.append(u'<a href="{href}" target="_blank" rel="nofollow">{name}</a>'.format(
-                href=os.path.join(url, str(key_value)),
-                name=name
-            ))
+            classification.append(
+                u'<a href="{href}" target="_blank" rel="nofollow">{name}</a>'.format(
+                    href=os.path.join(url, str(key_value)),
+                    name=name
+                    ))
         elif name:
             classification.append(name)
 
