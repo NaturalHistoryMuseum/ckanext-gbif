@@ -5,26 +5,22 @@
 # Created by the Natural History Museum in London, UK
 
 import os
-import pylons
-import ckan.plugins as p
-from ckanext.datastore.interfaces import IDatastore
+from ckanext.gbif.lib.helpers import (dqi_get_severity, dqi_parse_errors,
+                                      gbif_get_classification, gbif_get_geography,
+                                      gbif_render_datetime)
 from ckanext.gbif.logic.action import gbif_record_show
-from ckanext.gbif.lib.helpers import (
-    dqi_parse_errors,
-    dqi_get_severity,
-    gbif_get_geography,
-    gbif_get_classification,
-    gbif_render_datetime
-)
+
+from ckan.plugins import SingletonPlugin, implements, interfaces, toolkit
+from ckanext.datastore.interfaces import IDatastore
 
 
-class GBIFPlugin(p.SingletonPlugin):
+class GBIFPlugin(SingletonPlugin):
     '''GBIF plugin - Data Quality Indicators'''
-    p.implements(p.IActions, inherit=True)
-    p.implements(p.IConfigurer)
-    p.implements(p.IRoutes, inherit=True)
-    p.implements(p.ITemplateHelpers)
-    p.implements(IDatastore, inherit=True)
+    implements(interfaces.IActions, inherit=True)
+    implements(interfaces.IConfigurer)
+    implements(interfaces.IRoutes, inherit=True)
+    implements(interfaces.ITemplateHelpers)
+    implements(IDatastore, inherit=True)
 
     ## IConfigurer
     def update_config(self, config):
@@ -37,9 +33,11 @@ class GBIFPlugin(p.SingletonPlugin):
         # rather than using add_template_directory to ensure it is always used
         # to override templates
         root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        template_dir = os.path.join(root_dir, u'ckanext', u'gbif', u'theme', u'templates')
-        config[u'extra_template_paths'] = u','.join([template_dir, config.get(u'extra_template_paths', u'')])
-        p.toolkit.add_resource(u'theme/fanstatic', u'ckanext-gbif')
+        template_dir = os.path.join(root_dir, u'ckanext', u'gbif', u'theme',
+                                    u'templates')
+        config[u'extra_template_paths'] = u','.join(
+            [template_dir, config.get(u'extra_template_paths', u'')])
+        toolkit.add_resource(u'theme/fanstatic', u'ckanext-gbif')
 
     ## IRoutes
     def before_map(self, map):
@@ -49,7 +47,9 @@ class GBIFPlugin(p.SingletonPlugin):
 
         '''
         # Add GBIF record view
-        map.connect(u'gbif', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/gbif',
+        map.connect(u'gbif',
+                    '/dataset/{package_name}/resource/{resource_id}/record/{'
+                    'record_id}/gbif',
                     controller=u'ckanext.gbif.controllers.gbif:GBIFController',
                     action=u'view'
                     )
@@ -60,7 +60,7 @@ class GBIFPlugin(p.SingletonPlugin):
         ''' '''
         return {
             u'gbif_record_show': gbif_record_show
-        }
+            }
 
     # ITemplateHelpers
     def get_helpers(self):
@@ -71,4 +71,4 @@ class GBIFPlugin(p.SingletonPlugin):
             u'gbif_get_classification': gbif_get_classification,
             u'gbif_get_geography': gbif_get_geography,
             u'gbif_render_datetime': gbif_render_datetime
-        }
+            }
