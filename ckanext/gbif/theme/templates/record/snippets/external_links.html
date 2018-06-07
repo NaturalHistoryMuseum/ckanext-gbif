@@ -1,0 +1,8 @@
+{% ckan_extends %}
+
+{% block external_links_content %}
+    {{ super() }}
+    {% if record['gbifID'] %}
+        <a class="btn btn-primary" href="{{ h.get_gbif_record_url(pkg, res, record) }}">{{ _('GBIF View') }} &nbsp&nbsp<i class="icon-circle-arrow-right"></i></a>
+    {% endif %}
+{% endblock %}
