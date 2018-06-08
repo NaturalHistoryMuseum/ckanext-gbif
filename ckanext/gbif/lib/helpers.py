@@ -104,6 +104,8 @@ def get_gbif_record_url(pkg, res, rec):
     :param rec: the record dict
     :return: the link to the GBIF view for this record/resource/package combo
     '''
+    # find the gbif route defined in the plugin definition
     gbif_route = config['routes.named_routes']['gbif']
+    # return the url for package/resource/record combo requested
     return toolkit.url_for(controller=gbif_route['controller'], action=gbif_route['action'], package_name=pkg['name'],
                            resource_id=res['id'], record_id=rec['_id'])
