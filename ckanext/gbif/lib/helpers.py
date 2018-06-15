@@ -1,6 +1,8 @@
 import logging
 import os
 import dateutil.parser
+from pylons import config
+import ckan.plugins.toolkit as toolkit
 from webhelpers.html import literal
 from ckanext.gbif.lib.errors import GBIF_ERRORS, DQI_MAJOR_ERRORS, DQI_MINOR_ERRORS
 
@@ -92,3 +94,18 @@ def gbif_render_datetime(date_str):
     :return:
     """
     return dateutil.parser.parse(date_str).strftime("%B %d, %Y")
+
+
+def get_gbif_record_url(pkg, res, rec):
+    '''
+    Given details about a combination of package, resource and record, return the GBIF view URL created from them.
+    :param pkg: the package dict
+    :param res: the resource dict
+    :param rec: the record dict
+    :return: the link to the GBIF view for this record/resource/package combo
+    '''
+    # find the gbif route defined in the plugin definition
+    gbif_route = config['routes.named_routes']['gbif']
+    # return the url for package/resource/record combo requested
+    return toolkit.url_for(controller=gbif_route['controller'], action=gbif_route['action'], package_name=pkg['name'],
+                           resource_id=res['id'], record_id=rec['_id'])

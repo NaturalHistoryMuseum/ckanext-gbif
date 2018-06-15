@@ -8,7 +8,8 @@ from ckanext.gbif.lib.helpers import (
     dqi_get_severity,
     gbif_get_geography,
     gbif_get_classification,
-    gbif_render_datetime
+    gbif_render_datetime,
+    get_gbif_record_url
 )
 
 
@@ -54,5 +55,6 @@ class GBIFPlugin(p.SingletonPlugin):
             'dqi_parse_errors': dqi_parse_errors,
             'gbif_get_classification': gbif_get_classification,
             'gbif_get_geography': gbif_get_geography,
-            'gbif_render_datetime': gbif_render_datetime
+            'gbif_render_datetime': gbif_render_datetime,
+            'get_gbif_record_url': get_gbif_record_url
         }
