@@ -9,6 +9,14 @@ from ckanext.gbif.lib.helpers import (dqi_get_severity, dqi_parse_errors,
                                       gbif_get_classification, gbif_get_geography,
                                       gbif_render_datetime)
 from ckanext.gbif.logic.action import gbif_record_show
+from ckanext.gbif.lib.helpers import (
+    dqi_parse_errors,
+    dqi_get_severity,
+    gbif_get_geography,
+    gbif_get_classification,
+    gbif_render_datetime,
+    get_gbif_record_url
+)
 
 from ckan.plugins import SingletonPlugin, implements, interfaces, toolkit
 from ckanext.datastore.interfaces import IDatastore
@@ -70,5 +78,6 @@ class GBIFPlugin(SingletonPlugin):
             u'dqi_parse_errors': dqi_parse_errors,
             u'gbif_get_classification': gbif_get_classification,
             u'gbif_get_geography': gbif_get_geography,
-            u'gbif_render_datetime': gbif_render_datetime
-            }
+            u'gbif_render_datetime': gbif_render_datetime,
+            u'get_gbif_record_url': get_gbif_record_url
+        }
