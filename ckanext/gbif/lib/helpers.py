@@ -123,7 +123,7 @@ def get_gbif_record_url(pkg, res, rec):
     gbif_route = toolkit.config[u'routes.named_routes'][u'gbif']
     # return the url for package/resource/record combo requested
     return toolkit.url_for(controller=gbif_route[u'controller'],
-                           action=gbif_route[u'action'], 
+                           action=gbif_route[u'action'],
                            package_name=pkg[u'name'],
                            resource_id=res[u'id'],
                            record_id=rec[u'_id'])
