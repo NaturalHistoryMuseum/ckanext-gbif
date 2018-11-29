@@ -61,7 +61,7 @@ def gbif_get_classification(gbif_record):
 
     url = 'http://www.gbif.org/species'
     for classification_part in ['kingdom', 'phylum', 'class', 'taxonorder', 'family', 'genus']:
-        key = '%skey' % classification_part
+        key = '%sKey' % classification_part
         key_value = gbif_record.get(key, None)
         name = gbif_record.get(classification_part, None)
         if key_value:

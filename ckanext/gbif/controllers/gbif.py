@@ -40,16 +40,13 @@ class GBIFController(p.toolkit.BaseController):
         except NotAuthorized:
             abort(401, _('Unauthorized to read resource %s') % package_name)
 
-        occurrence_id = c.record_dict.get('occurrenceID')
-
-        if not occurrence_id:
+        gbif_id = c.record_dict.get('gbifID', None)
+        if gbif_id is None:
             abort(404, _('GBIF record not found'))
 
         # And get the GBIF record
         try:
-            gbif_record = tk.get_action('gbif_record_show')(context, {
-                'occurrence_id': occurrence_id
-            })
+            gbif_record = tk.get_action('gbif_record_show')(context, {'gbif_id': gbif_id})
         except NotFound:
             abort(404, _('GBIF record not found'))
         else:

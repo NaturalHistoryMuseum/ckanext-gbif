@@ -17,7 +17,7 @@
 
         {% set classification = h.gbif_get_classification(gbif_record) %}
 
-        {% set errors = h.dqi_parse_errors(gbif_record['issue']) %}
+        {% set errors = h.dqi_parse_errors(gbif_record['issues']) %}
 
         {% if classification or gbif_record['specieskey'] or gbif_record['identifiedby'] %}
 
@@ -29,12 +29,12 @@
             </thead>
             <tbody>
 
-                {% if gbif_record['specieskey'] %}
+                {% if gbif_record['speciesKey'] %}
 
                     <tr>
                         <td><strong>Identified as species</strong></td>
                         <td>
-                            <a href="http://www.gbif.org/species/{{ gbif_record['specieskey'] }}" target="_blank" rel="nofollow">{{ gbif_record['gbifScientificName'] }}</a>
+                            <a href="http://www.gbif.org/species/{{ gbif_record['speciesKey'] }}" target="_blank" rel="nofollow">{{ gbif_record['scientificName'] }}</a>
                         </td>
                     </tr>
 
@@ -51,12 +51,12 @@
 
                 {% endif %}
 
-                {% if gbif_record['identifiedby'] %}
+                {% if gbif_record['identifiedBy'] %}
 
                     <tr>
                         <td><strong>Identified</strong></td>
                         <td>
-                            {{ gbif_record['identifiedby'] }}
+                            {{ gbif_record['identifiedBy'] }}
                         </td>
                     </tr>
 
@@ -68,7 +68,7 @@
 
         {# Occurrence details #}
 
-        {% if gbif_record['recordedby'] or gbif_record['eventdate'] or gbif_record['recordnumber'] %}
+        {% if gbif_record['recordedBy'] or gbif_record['eventDate'] or gbif_record['recordNumber'] %}
 
             <thead>
                 <tr>
@@ -77,30 +77,30 @@
             </thead>
             <tbody>
 
-                {% if gbif_record['recordedby'] %}
+                {% if gbif_record['recordedBy'] %}
 
                     <tr>
                         <td><strong>Recorded by</strong></td>
-                        <td>{{ gbif_record['recordedby'] }}</td>
+                        <td>{{ gbif_record['recordedBy'] }}</td>
                     </tr>
 
                 {% endif %}
 
-                {% if gbif_record['eventdate'] %}
+                {% if gbif_record['eventDate'] %}
 
                     <tr>
                         <td><strong>Date recorded</strong></td>
-                        <td>{{ gbif_record['eventdate'] }}</td>
+                        <td>{{ gbif_record['eventDate'] }}</td>
                     </tr>
 
                 {% endif %}
 
 
-                {% if gbif_record['recordnumber'] %}
+                {% if gbif_record['recordNumber'] %}
 
                     <tr>
                         <td><strong>Record number</strong></td>
-                        <td>{{ gbif_record['recordnumber'] }}</td>
+                        <td>{{ gbif_record['recordNumber'] }}</td>
                     </tr>
 
                 {% endif %}
@@ -113,7 +113,7 @@
 
         {% set geography = h.gbif_get_geography(gbif_record) %}
 
-        {% if geography or gbif_record['habitat'] or gbif_record['countrycode'] or gbif_record['islandgroup'] or (gbif_record['decimallongitude'] and gbif_record['decimallatitude']) %}
+        {% if geography or gbif_record['habitat'] or gbif_record['countryCode'] or gbif_record['islandGroup'] or (gbif_record['decimalLongitude'] and gbif_record['decimalLatitude']) %}
 
             <thead>
                 <tr>
@@ -122,20 +122,20 @@
             </thead>
             <tbody>
 
-                {% if gbif_record['countrycode'] %}
+                {% if gbif_record['countryCode'] %}
 
                     <tr>
                         <td><strong>Country</strong></td>
-                        <td><a href="http://www.gbif.org/country/{{ gbif_record['countrycode'] }}" target="_blank" rel="nofollow">{{ gbif_record['country'] or gbif_record['countrycode'] }}</a></td>
+                        <td><a href="http://www.gbif.org/country/{{ gbif_record['countryCode'] }}" target="_blank" rel="nofollow">{{ gbif_record['country'] or gbif_record['countryCode'] }}</a></td>
                     </tr>
 
                 {% endif %}
 
-                {% if gbif_record['decimallongitude'] and gbif_record['decimallatitude'] %}
+                {% if gbif_record['decimalLongitude'] and gbif_record['decimalLatitude'] %}
 
                     <tr>
                         <td><strong>Coordinates</strong></td>
-                        <td><a href="http://www.gbif.org/occurrence/{{ gbif_record['id'] }}" target="_blank" rel="nofollow">{{ gbif_record['decimallongitude'] }}, {{ gbif_record['decimallatitude'] }}</a></td>
+                        <td><a href="http://www.gbif.org/occurrence/{{ gbif_record['id'] }}" target="_blank" rel="nofollow">{{ gbif_record['decimalLongitude'] }}, {{ gbif_record['decimalLatitude'] }}</a></td>
                     </tr>
 
                 {% endif %}
@@ -151,11 +151,11 @@
 
                 {% endif %}
 
-                {% if gbif_record['islandgroup'] %}
+                {% if gbif_record['islandGroup'] %}
 
                     <tr>
                         <td><strong>Islands</strong></td>
-                        <td>{{ gbif_record['islandgroup'] }}</td>
+                        <td>{{ gbif_record['islandGroup'] }}</td>
                     </tr>
 
                 {% endif %}
@@ -206,12 +206,12 @@
 
             <tr>
                 <td><strong>Last interpreted</strong></td>
-                <td>{{ h.gbif_render_datetime(gbif_record['lastinterpreted']) }}</td>
+                <td>{{ h.gbif_render_datetime(gbif_record['lastInterpreted']) }}</td>
             </tr>
 
             <tr>
                 <td><strong>Occurrence</strong></td>
-                <td><a href="http://www.gbif.org/occurrence/{{ gbif_record['id'] }}" target="_blank" rel="nofollow">{{ gbif_record['id'] }}</a></td>
+                <td><a href="http://www.gbif.org/occurrence/{{ gbif_record['gbifID'] }}" target="_blank" rel="nofollow">{{ gbif_record['gbifID'] }}</a></td>
             </tr>
 
             <tr>
