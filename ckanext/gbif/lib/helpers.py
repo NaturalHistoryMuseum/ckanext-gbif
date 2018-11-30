@@ -4,39 +4,29 @@ import dateutil.parser
 from pylons import config
 import ckan.plugins.toolkit as toolkit
 from webhelpers.html import literal
-from ckanext.gbif.lib.errors import GBIF_ERRORS, DQI_MAJOR_ERRORS, DQI_MINOR_ERRORS
+from ckanext.gbif.lib.errors import GBIF_ERRORS, DQI_MAJOR_ERRORS
 
 log = logging.getLogger(__name__)
 
 
-def dqi_parse_errors(dqi):
+def dqi_parse_errors(errors):
     """
-    Convert a DQI status string into a class name
-    @param dqi: Minor errors etc.,
-    @return: minor-errors
-    """
+    Convert each DQI status string into a more detailed dict.
 
-    errors = []
-    # BS: Hacky bug fix - DQIs are passed in as a list on record view, but not on GBIF page!
-    dqi = dqi[0] if isinstance(dqi, list) else dqi
-    try:
-        error_codes = dqi.split(';')
-    except (AttributeError, TypeError):
-        pass
-    else:
-        for error_code in error_codes:
-            errors.append(GBIF_ERRORS[error_code])
-    return errors
+    :param errors: a list of error names
+    :return: a list of dicts of information about each error
+    """
+    return [GBIF_ERRORS[error_code] for error_code in errors] if errors else []
 
 
 def dqi_get_severity(errors, gbif_id):
     """
-    Get class name for severity of errors
-    :param errors:
-    :param gbif_id:
-    :return:
-    """
+    Get status for severity of errors.
 
+    :param errors: a list of errors
+    :param gbif_id: the GBIF occurrence id for this record
+    :return: the status to show
+    """
     if not gbif_id:
         return 'unknown'
 
@@ -45,7 +35,7 @@ def dqi_get_severity(errors, gbif_id):
 
     for error in errors:
         if error['severity'] == DQI_MAJOR_ERRORS:
-            # If we have one major error, the whole thing is major error
+            # if we have one major error, the whole thing is major error
             return 'Major errors'
 
     return 'Minor errors'
