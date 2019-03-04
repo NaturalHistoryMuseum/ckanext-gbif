@@ -1,9 +1,13 @@
 import logging
-import os
+
 import dateutil.parser
+import os
 from pylons import config
-import ckan.plugins.toolkit as toolkit
 from webhelpers.html import literal
+
+from ckan.common import _
+import ckan.plugins.toolkit as toolkit
+from ckan.lib.helpers import build_nav_icon
 from ckanext.gbif.lib.errors import GBIF_ERRORS, DQI_MAJOR_ERRORS
 
 log = logging.getLogger(__name__)
@@ -99,3 +103,30 @@ def get_gbif_record_url(pkg, res, rec):
     # return the url for package/resource/record combo requested
     return toolkit.url_for(controller=gbif_route['controller'], action=gbif_route['action'], package_name=pkg['name'],
                            resource_id=res['id'], record_id=rec['_id'])
+
+
+def build_gbif_nav_item(package_name, resource_id, record_id, version=None):
+    '''
+    Creates the gbif specimen nav item allowing the user to navigate to the gbif views of the
+    specimen record data. A single nav item is returned.
+
+    :param package_name: the package name (or id)
+    :param resource_id: the resource id
+    :param record_id: the record id
+    :param version: the version of the record, or None if no version is present
+    :return: a nav items
+    '''
+    route_name = u'gbif'
+    link_text = _(u'GBIF view')
+    kwargs = {
+        u'package_name': package_name,
+        u'resource_id': resource_id,
+        u'record_id': record_id,
+    }
+    # if there's a version, alter the target of our nav item (the name of the route) and add the
+    # version to kwargs we're going to pass to the nav builder helper function
+    if version is not None:
+        route_name = u'{}_versioned'.format(route_name)
+        kwargs[u'version'] = version
+    # build the nav and return it
+    return build_nav_icon(route_name, link_text, **kwargs)

@@ -1,16 +1,16 @@
 import os
-import pylons
+
 import ckan.plugins as p
 from ckanext.datastore.interfaces import IDatastore
-from ckanext.gbif.logic.action import gbif_record_show
 from ckanext.gbif.lib.helpers import (
     dqi_parse_errors,
     dqi_get_severity,
     gbif_get_geography,
     gbif_get_classification,
     gbif_render_datetime,
-    get_gbif_record_url
-)
+    get_gbif_record_url,
+    build_gbif_nav_item)
+from ckanext.gbif.logic.action import gbif_record_show
 
 
 class GBIFPlugin(p.SingletonPlugin):
@@ -36,10 +36,14 @@ class GBIFPlugin(p.SingletonPlugin):
     ## IRoutes
     def before_map(self, map):
         # Add GBIF record view
-        map.connect('gbif', '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/gbif',
+        map.connect('gbif_versioned',
+                     '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/gbif/{version}',
+                     controller='ckanext.gbif.controllers.gbif:GBIFController',
+                     action='view', requirements={'version': '\d+'})
+        map.connect('gbif',
+                    '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/gbif',
                     controller='ckanext.gbif.controllers.gbif:GBIFController',
-                    action='view'
-                    )
+                    action='view')
 
         return map
 
@@ -56,5 +60,6 @@ class GBIFPlugin(p.SingletonPlugin):
             'gbif_get_classification': gbif_get_classification,
             'gbif_get_geography': gbif_get_geography,
             'gbif_render_datetime': gbif_render_datetime,
-            'get_gbif_record_url': get_gbif_record_url
+            'get_gbif_record_url': get_gbif_record_url,
+            'build_gbif_nav_item': build_gbif_nav_item,
         }

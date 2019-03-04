@@ -23,7 +23,7 @@ class GBIFController(p.toolkit.BaseController):
     """
     Controller for displaying about pages
     """
-    def view(self, package_name, resource_id, record_id):
+    def view(self, package_name, resource_id, record_id, version=None):
 
         context = {'model': model, 'session': model.Session, 'user': c.user or c.author}
 
@@ -32,9 +32,14 @@ class GBIFController(p.toolkit.BaseController):
             c.resource = get_action('resource_show')(context, {'id': resource_id})
             c.package = get_action('package_show')(context, {'id': package_name})
             c.pkg_dict = c.package
-            record = get_action('record_show')(context, {'resource_id': resource_id, 'record_id': record_id})
-            c.record_dict = record['data']
 
+            record_data_dict = {'resource_id': resource_id, 'record_id': record_id}
+            if version is not None:
+                version = int(version)
+                record_data_dict['version'] = version
+            c.version = version
+            record = get_action('record_show')(context, record_data_dict)
+            c.record_dict = record['data']
         except NotFound:
             abort(404, _('Resource not found'))
         except NotAuthorized:
