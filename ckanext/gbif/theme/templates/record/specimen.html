@@ -4,7 +4,9 @@
 
     {{ super() }}
 
-    {{ h.build_gbif_nav_item(pkg.name, res.id, rec._id, c.version) }}
+    {% if c.record_dict['gbifID'] %}
+        {{ h.build_gbif_nav_item(pkg.name, res.id, rec._id, c.version) }}
+    {% endif %}
 
 {% endblock %}
 
