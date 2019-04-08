@@ -1,25 +1,22 @@
-import pylons
+import requests
+
 import ckan.logic as logic
-from ckanext.datastore.db import _get_engine
-from ckanext.datastore.db import _execute_single_statement
 
 _get_or_bust = logic.get_or_bust
 NotFound = logic.NotFound
 
 
 def gbif_record_show(context, data_dict):
-    """ Update the DQI of a record based on a list of GBIF errors
-    @param context: CKAN context
-    @param data_dict: Action parameters:
-        - occurrence_id
     """
-    occurrence_id = _get_or_bust(data_dict, 'occurrence_id')
-    # Set up DB connection to datastore
-    context['connection'] = _get_engine({'connection_url': pylons.config['ckan.datastore.read_url']}).connect()
-    sql = 'SELECT * FROM gbif WHERE occurrenceid=%s LIMIT 1'
-    result = _execute_single_statement(context, sql, occurrence_id)
-    record = result.fetchone()
-    if record:
-        return dict(record)
-    else:
+    Retrieve a GBIF record with the given GBIF ID. This is done via the GBIF API.
+
+    :param context: CKAN context
+    :param data_dict: dict of parameters, only one is required: gbif_id
+    """
+    gbif_id = _get_or_bust(data_dict, u'gbif_id')
+    response = requests.get(u'https://api.gbif.org/v1/occurrence/{}'.format(gbif_id))
+    # if there was an error getting the record, raise a not found error
+    if 400 <= response.status_code < 600:
         raise NotFound
+    else:
+        return response.json()
