@@ -1,14 +1,14 @@
 <div id='dqi' class="pull-right" data-module="gbif-dqi" data-module-gbif-id="{{ gbif_id }}">
 
-    {% set errors_list = h.dqi_parse_errors(errors) %}
-    {% set severity = h.dqi_get_severity(errors_list, gbif_id) %}
+    {% set errors = h.dqi_parse_errors(errors) %}
+    {% set severity = h.dqi_get_severity(errors, gbif_id) %}
 
     GBIF quality indicators: <span title="{{ severity }}" class="dqi-pill dqi-{{ severity.lower().replace(' ', '-') }}">{{ severity }}</span>
 
-    {% if errors_list %}
+    {% if errors %}
         <div class="dqi-errors">
             <ul>
-                {% for error in errors_list: %}
+                {% for error in errors %}
                     <li class="{{ error.severity.lower().replace(' ', '-') }}"><abbr title="{{ error.description }}">{{ error.title }}</abbr></li>
                 {% endfor %}
             </ul>
