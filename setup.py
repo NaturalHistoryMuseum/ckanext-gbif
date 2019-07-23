@@ -6,18 +6,27 @@
 
 from setuptools import find_packages, setup
 
-version = u'0.2'
+__version__ = u'1.0.0-alpha'
+
+with open(u'README.md', u'r') as f:
+    __long_description__ = f.read()
 
 setup(
     name=u'ckanext-gbif',
-    version=version,
-    description=u'GBIF',
-    long_description=u'''GBIF Data Quality indicators''',
-    classifiers=[],
-    # Get strings from http://pypi.python.org/pypi?%3Aaction=list_classifiers
-    keywords=u'',
-    license=u'',
-    packages=find_packages(exclude=[u'ez_setup', u'examples', u'tests']),
+    version=__version__,
+    description=u'A CKAN extension that that connects with the GBIF API.',
+    long_description=__long_description__,
+    classifiers=[
+        u'Development Status :: 3 - Alpha',
+        u'Framework :: Flask',
+        u'Programming Language :: Python :: 2.7'
+    ],
+    keywords=u'CKAN data gbif',
+    author=u'Natural History Museum',
+    author_email=u'data@nhm.ac.uk',
+    url=u'https://github.com/NaturalHistoryMuseum/ckanext-gbif',
+    license=u'GNU GPLv3',
+    packages=find_packages(exclude=[u'tests']),
     namespace_packages=[u'ckanext', u'ckanext.gbif'],
     include_package_data=True,
     zip_safe=False,
@@ -27,7 +36,7 @@ setup(
         ],
     entry_points= \
         u'''
-            [ckan.plugins]
-                gbif = ckanext.gbif.plugin:GBIFPlugin
+        [ckan.plugins]
+            gbif=ckanext.gbif.plugin:GBIFPlugin
         ''',
     )
