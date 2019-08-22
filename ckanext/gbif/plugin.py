@@ -15,6 +15,7 @@ from ckanext.gbif.lib.helpers import (
     get_gbif_record_url,
     build_gbif_nav_item)
 from ckanext.gbif.logic.action import gbif_record_show
+from ckanext.gbif import routes
 
 from ckan.plugins import SingletonPlugin, implements, interfaces, toolkit
 from ckanext.datastore.interfaces import IDatastore
@@ -24,7 +25,7 @@ class GBIFPlugin(SingletonPlugin):
     '''GBIF plugin - Data Quality Indicators'''
     implements(interfaces.IActions, inherit=True)
     implements(interfaces.IConfigurer)
-    implements(interfaces.IRoutes, inherit=True)
+    implements(interfaces.IBlueprint, inherit=True)
     implements(interfaces.ITemplateHelpers)
     implements(IDatastore, inherit=True)
 
@@ -32,7 +33,7 @@ class GBIFPlugin(SingletonPlugin):
     def update_config(self, config):
         '''
 
-        :param config: 
+        :param config:
 
         '''
         # Add template directory - we manually add to extra_template_paths
@@ -45,24 +46,9 @@ class GBIFPlugin(SingletonPlugin):
             [template_dir, config.get(u'extra_template_paths', u'')])
         toolkit.add_resource(u'theme/fanstatic', u'ckanext-gbif')
 
-    ## IRoutes
-    def before_map(self, map):
-        '''
-
-        :param map: 
-
-        '''
-        # Add GBIF record view
-        map.connect(u'gbif_versioned',
-                     '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/gbif/{version}',
-                     controller=u'ckanext.gbif.controllers.gbif:GBIFController',
-                     action=u'view', requirements={u'version': u'\d+'})
-        map.connect(u'gbif',
-                    '/dataset/{package_name}/resource/{resource_id}/record/{record_id}/gbif',
-                    controller=u'ckanext.gbif.controllers.gbif:GBIFController',
-                    action=u'view')
-
-        return map
+    ## IBlueprint
+    def get_blueprint(self):
+        return routes.blueprints
 
     def get_actions(self):
         ''' '''
