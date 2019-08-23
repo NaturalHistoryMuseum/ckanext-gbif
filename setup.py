@@ -32,7 +32,7 @@ setup(
     zip_safe=False,
     install_requires=[
         u'requests',
-        u'python-dateutil'
+        u'python-dateutil',
         ],
     entry_points= \
         u'''
