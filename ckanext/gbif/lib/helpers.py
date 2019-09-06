@@ -77,7 +77,7 @@ def gbif_get_classification(gbif_record):
 def gbif_get_geography(occurrence):
     '''
 
-    :param occurrence: 
+    :param occurrence:
 
     '''
     geography = []
@@ -109,11 +109,8 @@ def get_gbif_record_url(pkg, res, rec):
     :param rec: the record dict
     :return: the link to the GBIF view for this record/resource/package combo
     '''
-    # find the gbif route defined in the plugin definition
-    gbif_route = toolkit.config[u'routes.named_routes'][u'gbif']
     # return the url for package/resource/record combo requested
-    return toolkit.url_for(controller=gbif_route[u'controller'],
-                           action=gbif_route[u'action'],
+    return toolkit.url_for(u'gbif.view',
                            package_name=pkg[u'name'],
                            resource_id=res[u'id'],
                            record_id=rec[u'_id'])
@@ -131,7 +128,7 @@ def build_gbif_nav_item(package_name, resource_id, record_id, version=None):
     :param version: the version of the record, or None if no version is present
     :return: a nav items
     '''
-    route_name = u'gbif'
+    route_name = u'gbif.view'
     link_text = toolkit._(u'GBIF view')
     kwargs = {
         u'package_name': package_name,
