@@ -28,6 +28,7 @@ def view(package_name, resource_id, record_id, version=None):
         toolkit.c.package = toolkit.get_action(u'package_show')(context, {
             u'id': package_name
             })
+        toolkit.c.pkg = context[u'package']
         toolkit.c.pkg_dict = toolkit.c.package
 
         record_data_dict = {
