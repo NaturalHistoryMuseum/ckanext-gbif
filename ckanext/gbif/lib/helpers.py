@@ -71,7 +71,7 @@ def gbif_get_classification(gbif_record):
         elif name:
             classification.append(name)
 
-    return literal(u' <i class="icon-angle-right"></i> '.join(classification))
+    return literal(u' <i class="fa fa-angle-right"></i> '.join(classification))
 
 
 def gbif_get_geography(occurrence):
