@@ -1,9 +1,12 @@
+#!/usr/bin/env python
+# encoding: utf-8
+#
+# This file is part of ckanext-gbif
+# Created by the Natural History Museum in London, UK
+
 import requests
 
-import ckan.logic as logic
-
-_get_or_bust = logic.get_or_bust
-NotFound = logic.NotFound
+from ckan.plugins import toolkit
 
 
 def gbif_record_show(context, data_dict):
@@ -13,10 +16,10 @@ def gbif_record_show(context, data_dict):
     :param context: CKAN context
     :param data_dict: dict of parameters, only one is required: gbif_id
     """
-    gbif_id = _get_or_bust(data_dict, u'gbif_id')
+    gbif_id = toolkit.get_or_bust(data_dict, u'gbif_id')
     response = requests.get(u'https://api.gbif.org/v1/occurrence/{}'.format(gbif_id))
     # if there was an error getting the record, raise a not found error
     if 400 <= response.status_code < 600:
-        raise NotFound
+        raise toolkit.ObjectNotFound
     else:
         return response.json()

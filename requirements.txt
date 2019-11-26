@@ -1,3 +1,4 @@
+# install from setup.py
+.
 
-requests
-python-dateutil
+# dev overrides/additional libraries

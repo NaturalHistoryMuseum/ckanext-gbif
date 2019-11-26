@@ -4,10 +4,6 @@
 # This file is part of ckanext-gbif
 # Created by the Natural History Museum in London, UK
 
+from . import gbif
 
-def main():
-    pass
-
-
-if __name__ == u'__main__':
-    main()
+blueprints = [gbif.blueprint]
