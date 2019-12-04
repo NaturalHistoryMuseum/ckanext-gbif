@@ -119,8 +119,7 @@ def get_gbif_record_url(pkg, res, rec):
 def build_gbif_nav_item(package_name, resource_id, record_id, version=None):
     '''
     Creates the gbif specimen nav item allowing the user to navigate to the gbif views
-    of the
-    specimen record data. A single nav item is returned.
+    of the specimen record data. A single nav item is returned.
 
     :param package_name: the package name (or id)
     :param resource_id: the resource id
@@ -128,18 +127,13 @@ def build_gbif_nav_item(package_name, resource_id, record_id, version=None):
     :param version: the version of the record, or None if no version is present
     :return: a nav items
     '''
-    route_name = u'gbif.view'
-    link_text = toolkit._(u'GBIF view')
     kwargs = {
         u'package_name': package_name,
         u'resource_id': resource_id,
         u'record_id': record_id,
-        }
-    # if there's a version, alter the target of our nav item (the name of the route)
-    # and add the
-    # version to kwargs we're going to pass to the nav builder helper function
+    }
+    # if there's a version, add it to the kwargs
     if version is not None:
-        route_name = u'{}_versioned'.format(route_name)
         kwargs[u'version'] = version
     # build the nav and return it
-    return toolkit.h.build_nav_icon(route_name, link_text, **kwargs)
+    return toolkit.h.build_nav_icon(u'gbif.view', toolkit._(u'GBIF view'), **kwargs)
