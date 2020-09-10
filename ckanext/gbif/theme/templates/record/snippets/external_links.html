@@ -3,8 +3,12 @@
 {% block external_links_content %}
     {{ super() }}
 
-    {# only show the gbif link if we're not on the gbif view #}
+    {# only show the gbif links if we're not on the gbif view #}
     {% if record['gbifID'] and not request.url.endswith('gbif') %}
         <a class="btn btn-primary" href="{{ h.get_gbif_record_url(pkg_dict, res, record) }}">{{ _('Find more links on the GBIF View') }} &nbsp&nbsp<i class="fas fa-circle-arrow-right"></i></a>
+
+        <a class="btn btn-primary" href="https://gbif.org/occurrence/{{ record.gbifID }}/cluster">
+            {{ _('View GBIF record cluster (experimental)') }} <i class="fas fa-external-link-alt inline-icon-right"></i>
+        </a>
     {% endif %}
 {% endblock %}
