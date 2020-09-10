@@ -10,12 +10,12 @@ span.dqi-pill{
 }
 
 span.dqi-major-errors  {
-    background: #DF2621;
+    background: #6E001B;
     border-color: #A42122;
 }
 
 span.dqi-minor-errors {
-    background: #FCC524;
+    background: #aa5d00;
     border-color: #EDAC00;
 }
 
@@ -25,13 +25,13 @@ span.dqi-minor-errors{
 }
 
 span.dqi-no-errors {
-    background: #91C400 ;
+    background: #5f8100 ;
     border-color: #73B100;
 }
 
 span.dqi-unknown{
     border-color: #aaa;
-    background: #bbb;
+    background: #6e6e6e;
 }
 
 div#dqi{
