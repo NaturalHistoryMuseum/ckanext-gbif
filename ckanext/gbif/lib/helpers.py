@@ -23,7 +23,10 @@ def dqi_parse_errors(errors):
     :param errors: a list of error names
     :return: a list of dicts of information about each error
     """
-    return [GBIF_ERRORS[error_code] for error_code in errors] if errors else []
+    if not errors:
+        return []
+    # do an in check to make sure that we don't break if the error is one we just haven't mapped yet
+    return [GBIF_ERRORS[error_code] for error_code in errors if error_code in GBIF_ERRORS]
 
 
 def dqi_get_severity(errors, gbif_id):
