@@ -1,0 +1,18 @@
+dqi-css:
+  output: ckanext-gbif/%(version)s_dqi.css
+  contents:
+    - css/gbif.css
+
+dqi-js:
+  output: ckanext-gbif/%(version)s_dqi.js
+  filters: rjsmin
+  extra:
+    preload:
+      - base/main
+  contents:
+    - scripts/gbif-dqi.js
+
+record:
+  output: ckanext-gbif/%(version)s_record.css
+  contents:
+    - css/gbif.css

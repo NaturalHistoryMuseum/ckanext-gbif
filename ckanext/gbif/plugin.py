@@ -36,15 +36,8 @@ class GBIFPlugin(SingletonPlugin):
         :param config:
 
         '''
-        # Add template directory - we manually add to extra_template_paths
-        # rather than using add_template_directory to ensure it is always used
-        # to override templates
-        root_dir = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-        template_dir = os.path.join(root_dir, u'ckanext', u'gbif', u'theme',
-                                    u'templates')
-        config[u'extra_template_paths'] = u','.join(
-            [template_dir, config.get(u'extra_template_paths', u'')])
-        toolkit.add_resource(u'theme/fanstatic', u'ckanext-gbif')
+        toolkit.add_template_directory(config, u'theme/templates')
+        toolkit.add_resource(u'theme/assets', u'ckanext-gbif')
 
     ## IBlueprint
     def get_blueprint(self):
