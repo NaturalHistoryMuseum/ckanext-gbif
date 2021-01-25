@@ -22,8 +22,8 @@ class GBIFPlugin(SingletonPlugin):
         '''
         :param config:
         '''
-        toolkit.add_template_directory(config, u'theme/templates')
-        toolkit.add_resource(u'theme/assets', u'ckanext-gbif')
+        toolkit.add_template_directory(config, 'theme/templates')
+        toolkit.add_resource('theme/assets', 'ckanext-gbif')
 
     ## IBlueprint
     def get_blueprint(self):
@@ -32,18 +32,18 @@ class GBIFPlugin(SingletonPlugin):
     def get_actions(self):
         ''' '''
         return {
-            u'gbif_record_show': gbif_record_show
+            'gbif_record_show': gbif_record_show
         }
 
     # ITemplateHelpers
     def get_helpers(self):
         ''' '''
         return {
-            u'dqi_get_severity': helpers.dqi_get_severity,
-            u'dqi_parse_errors': helpers.dqi_parse_errors,
-            u'gbif_get_classification': helpers.gbif_get_classification,
-            u'gbif_get_geography': helpers.gbif_get_geography,
-            u'gbif_render_datetime': helpers.gbif_render_datetime,
-            u'get_gbif_record_url': helpers.get_gbif_record_url,
-            u'build_gbif_nav_item': helpers.build_gbif_nav_item,
+            'dqi_get_severity': helpers.dqi_get_severity,
+            'dqi_parse_errors': helpers.dqi_parse_errors,
+            'gbif_get_classification': helpers.gbif_get_classification,
+            'gbif_get_geography': helpers.gbif_get_geography,
+            'gbif_render_datetime': helpers.gbif_render_datetime,
+            'get_gbif_record_url': helpers.get_gbif_record_url,
+            'build_gbif_nav_item': helpers.build_gbif_nav_item,
         }

@@ -7,11 +7,10 @@
 import logging
 
 import dateutil.parser
-import os
-from ckanext.gbif.lib.errors import DQI_MAJOR_ERRORS, GBIF_ERRORS
-from webhelpers.html import literal
-
+from ckan.lib.helpers import literal
 from ckan.plugins import toolkit
+
+from ckanext.gbif.lib.errors import DQI_MAJOR_ERRORS, GBIF_ERRORS
 
 log = logging.getLogger(__name__)
 
@@ -38,69 +37,62 @@ def dqi_get_severity(errors, gbif_id):
     :return: the status to show
     """
     if not gbif_id:
-        return u'unknown'
+        return 'unknown'
 
     if not errors:
-        return u'No errors'
+        return 'No errors'
 
     for error in errors:
-        if error[u'severity'] == DQI_MAJOR_ERRORS:
+        if error['severity'] == DQI_MAJOR_ERRORS:
             # if we have one major error, the whole thing is major error
-            return u'Major errors'
+            return 'Major errors'
 
-    return u'Minor errors'
+    return 'Minor errors'
 
 
 def gbif_get_classification(gbif_record):
-    '''Loop through all the classification parts, building an array of parts
+    '''
+    Loop through all the classification parts, building an array of parts
 
     :param gbif_record: return:
-
     '''
     classification = []
 
-    url = u'http://www.gbif.org/species'
-    for classification_part in [u'kingdom', u'phylum', u'class', u'taxonorder', u'family',
-                                u'genus']:
-        key = u'%sKey' % classification_part
+    url = 'http://www.gbif.org/species'
+    for classification_part in ['kingdom', 'phylum', 'class', 'taxonorder', 'family', 'genus']:
+        key = f'{classification_part}Key'
         key_value = gbif_record.get(key, None)
         name = gbif_record.get(classification_part, None)
         if key_value:
             classification.append(
-                u'<a href="{href}" target="_blank" rel="nofollow">{name}</a>'.format(
-                    href=os.path.join(url, str(key_value)),
-                    name=name
-                    ))
+                f'<a href="{url}/{key_value}" target="_blank" rel="nofollow">{name}</a>')
         elif name:
             classification.append(name)
 
-    return literal(u' <i class="fa fa-angle-right"></i> '.join(classification))
+    return literal(' <i class="fa fa-angle-right"></i> '.join(classification))
 
 
 def gbif_get_geography(occurrence):
     '''
-
     :param occurrence:
-
     '''
     geography = []
-    for geographic_part in [u'continent', u'country', u'stateprovince']:
-
+    for geographic_part in ['continent', 'country', 'stateprovince']:
         value = occurrence.get(geographic_part, None)
 
         if value:
-            geography.append(value.replace(u'_', u' '))
+            geography.append(value.replace('_', ' '))
 
-    return literal(u' <i class="icon-angle-right"></i> '.join(geography))
+    return literal(' <i class="icon-angle-right"></i> '.join(geography))
 
 
 def gbif_render_datetime(date_str):
-    '''Render a GBIF formatted datetime
+    '''
+    Render a GBIF formatted datetime
 
     :param date_str: return:
-
     '''
-    return dateutil.parser.parse(date_str).strftime(u'%B %d, %Y')
+    return dateutil.parser.parse(date_str).strftime('%B %d, %Y')
 
 
 def get_gbif_record_url(pkg, res, rec):
@@ -113,10 +105,10 @@ def get_gbif_record_url(pkg, res, rec):
     :return: the link to the GBIF view for this record/resource/package combo
     '''
     # return the url for package/resource/record combo requested
-    return toolkit.url_for(u'gbif.view',
-                           package_name=pkg[u'name'],
-                           resource_id=res[u'id'],
-                           record_id=rec[u'_id'])
+    return toolkit.url_for('gbif.view',
+                           package_name=pkg['name'],
+                           resource_id=res['id'],
+                           record_id=rec['_id'])
 
 
 def build_gbif_nav_item(package_name, resource_id, record_id, version=None):
@@ -131,12 +123,12 @@ def build_gbif_nav_item(package_name, resource_id, record_id, version=None):
     :return: a nav items
     '''
     kwargs = {
-        u'package_name': package_name,
-        u'resource_id': resource_id,
-        u'record_id': record_id,
+        'package_name': package_name,
+        'resource_id': resource_id,
+        'record_id': record_id,
     }
     # if there's a version, add it to the kwargs
     if version is not None:
-        kwargs[u'version'] = version
+        kwargs['version'] = version
     # build the nav and return it
-    return toolkit.h.build_nav_icon(u'gbif.view', toolkit._(u'GBIF view'), **kwargs)
+    return toolkit.h.build_nav_icon('gbif.view', toolkit._('GBIF view'), **kwargs)
