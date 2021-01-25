@@ -1,12 +1,13 @@
+from unittest.mock import patch, MagicMock, call
+
 import pytest
 from ckan.plugins import toolkit
-from mock import patch, MagicMock, call
 
 from ckanext.gbif.logic.action import gbif_record_show
 
 
 @patch('ckanext.gbif.logic.action.requests')
-class TestGBIFRecordShow(object):
+class TestGBIFRecordShow:
 
     def test_success(self, requests_mock):
         gbif_id = 'test'
