@@ -1,0 +1,132 @@
+span.dqi-pill {
+  display: inline-block;
+  padding: 0 9px;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 12px;
+  margin-left: 5px;
+  height: 26px;
+  line-height: 26px;
+}
+
+span.dqi-major-errors {
+  background: #6E001B;
+  border-color: #A42122;
+}
+
+span.dqi-minor-errors {
+  background: #aa5d00;
+  border-color: #EDAC00;
+}
+
+span.dqi-major-errors,
+span.dqi-minor-errors {
+  cursor: pointer;
+}
+
+span.dqi-no-errors {
+  background: #5f8100;
+  border-color: #73B100;
+}
+
+span.dqi-unknown {
+  border-color: #aaa;
+  background: #6e6e6e;
+}
+
+div#dqi {
+  position: relative;
+
+  /* Box showing the errors */
+  & div.dqi-errors {
+    position: absolute;
+    right: 0;
+    top: 24px;
+    background: #E6E6E6;
+    width: 300px;
+    padding: 15px 10px;
+
+    & ul {
+      margin: 0 0 0 25px;
+      list-style: none;
+      padding: 0;
+
+      & li {
+        margin: 10px 0;
+        padding-left: 0.5em;
+        text-indent: -.7em;
+
+        &:before {
+          content: "\f111";
+          font-family: FontAwesome;
+          font-weight: lighter;
+          font-style: normal;
+          text-decoration: inherit;
+          -webkit-font-smoothing: antialiased;
+          font-size: 8px;
+          line-height: 8px;
+          position: relative;
+          top: -2px;
+        }
+
+        &.minor-errors:before {
+          color: #FCC524;
+        }
+
+        &.major-errors:before {
+          color: #DF2621;
+        }
+
+        & abbr {
+          margin-left: 8px;
+        }
+      }
+    }
+  }
+}
+
+
+/* Hide the error list on start */
+.dqi-errors {
+  display: none;
+
+  & i {
+    display: block;
+    margin: 0 auto;
+    width: 14px;
+    height: 14px;
+    font-size: 14px;
+  }
+
+  & p {
+    text-align: center;
+    margin-top: 3px;
+  }
+}
+
+
+/* On click - active class added */
+.active {
+  & .dqi-errors {
+    display: block;
+  }
+
+  & span.dqi-pill {
+    background: #E6E6E6;
+    color: #000;
+  }
+}
+
+/* Record view */
+table#record-view {
+  & th small {
+    font-size: 14px;
+    color: #767676;
+    position: relative;
+    left: -5px;
+  }
+
+  & tr td {
+    padding: 6px 0;
+  }
+}
