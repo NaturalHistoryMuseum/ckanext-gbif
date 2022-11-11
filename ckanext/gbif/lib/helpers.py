@@ -25,7 +25,9 @@ def dqi_parse_errors(errors):
     if not errors:
         return []
     # do an in check to make sure that we don't break if the error is one we just haven't mapped yet
-    return [GBIF_ERRORS[error_code] for error_code in errors if error_code in GBIF_ERRORS]
+    return [
+        GBIF_ERRORS[error_code] for error_code in errors if error_code in GBIF_ERRORS
+    ]
 
 
 def dqi_get_severity(errors, gbif_id):
@@ -51,21 +53,29 @@ def dqi_get_severity(errors, gbif_id):
 
 
 def gbif_get_classification(gbif_record):
-    '''
-    Loop through all the classification parts, building an array of parts
+    """
+    Loop through all the classification parts, building an array of parts.
 
     :param gbif_record: return:
-    '''
+    """
     classification = []
 
     url = 'http://www.gbif.org/species'
-    for classification_part in ['kingdom', 'phylum', 'class', 'taxonorder', 'family', 'genus']:
+    for classification_part in [
+        'kingdom',
+        'phylum',
+        'class',
+        'taxonorder',
+        'family',
+        'genus',
+    ]:
         key = f'{classification_part}Key'
         key_value = gbif_record.get(key, None)
         name = gbif_record.get(classification_part, None)
         if key_value:
             classification.append(
-                f'<a href="{url}/{key_value}" target="_blank" rel="nofollow">{name}</a>')
+                f'<a href="{url}/{key_value}" target="_blank" rel="nofollow">{name}</a>'
+            )
         elif name:
             classification.append(name)
 
@@ -87,32 +97,35 @@ def gbif_get_geography(occurrence):
 
 
 def gbif_render_datetime(date_str):
-    '''
-    Render a GBIF formatted datetime
+    """
+    Render a GBIF formatted datetime.
 
     :param date_str: return:
-    '''
+    """
     return dateutil.parser.parse(date_str).strftime('%B %d, %Y')
 
 
 def get_gbif_record_url(pkg, res, rec):
-    '''
+    """
     Given details about a combination of package, resource and record, return the GBIF
     view URL created from them.
+
     :param pkg: the package dict
     :param res: the resource dict
     :param rec: the record dict
     :return: the link to the GBIF view for this record/resource/package combo
-    '''
+    """
     # return the url for package/resource/record combo requested
-    return toolkit.url_for('gbif.view',
-                           package_name=pkg['name'],
-                           resource_id=res['id'],
-                           record_id=rec['_id'])
+    return toolkit.url_for(
+        'gbif.view',
+        package_name=pkg['name'],
+        resource_id=res['id'],
+        record_id=rec['_id'],
+    )
 
 
 def build_gbif_nav_item(package_name, resource_id, record_id, version=None):
-    '''
+    """
     Creates the gbif specimen nav item allowing the user to navigate to the gbif views
     of the specimen record data. A single nav item is returned.
 
@@ -121,7 +134,7 @@ def build_gbif_nav_item(package_name, resource_id, record_id, version=None):
     :param record_id: the record id
     :param version: the version of the record, or None if no version is present
     :return: a nav items
-    '''
+    """
     kwargs = {
         'package_name': package_name,
         'resource_id': resource_id,

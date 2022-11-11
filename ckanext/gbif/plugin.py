@@ -12,6 +12,7 @@ from ckanext.gbif.logic.action import gbif_record_show
 
 class GBIFPlugin(SingletonPlugin):
     '''GBIF plugin - Data Quality Indicators'''
+
     implements(interfaces.IActions, inherit=True)
     implements(interfaces.IConfigurer)
     implements(interfaces.IBlueprint, inherit=True)
@@ -19,9 +20,6 @@ class GBIFPlugin(SingletonPlugin):
 
     ## IConfigurer
     def update_config(self, config):
-        '''
-        :param config:
-        '''
         toolkit.add_template_directory(config, 'theme/templates')
         toolkit.add_resource('theme/assets', 'ckanext-gbif')
 
@@ -30,14 +28,10 @@ class GBIFPlugin(SingletonPlugin):
         return routes.blueprints
 
     def get_actions(self):
-        ''' '''
-        return {
-            'gbif_record_show': gbif_record_show
-        }
+        return {'gbif_record_show': gbif_record_show}
 
     # ITemplateHelpers
     def get_helpers(self):
-        ''' '''
         return {
             'dqi_get_severity': helpers.dqi_get_severity,
             'dqi_parse_errors': helpers.dqi_parse_errors,
