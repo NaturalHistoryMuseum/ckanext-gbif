@@ -37,7 +37,7 @@ repository = "https://github.com/NaturalHistoryMuseum/ckanext-gbif"
 changelog = "https://github.com/NaturalHistoryMuseum/ckanext-gbif/blob/main/CHANGELOG.md"
 
 [project.entry-points."ckan.plugins"]
-gbif = "ckanext.gbif.plugin:GbifPlugin"
+gbif = "ckanext.gbif.plugin:GBIFPlugin"
 
 
 [build-system]
