@@ -1,3 +1,4 @@
+<!--header-start-->
 <img src=".github/nhm-logo.svg" align="left" width="150px" height="100px" hspace="40"/>
 
 # ckanext-gbif
@@ -10,16 +11,20 @@
 
 _A CKAN extension that that connects with the GBIF API._
 
+<!--header-end-->
 
 # Overview
 
+<!--overview-start-->
 This extension retrieves additional data (e.g. DQIs) from the [GBIF](https://gbif.org) API for a record with an associated GBIF ID.
 
 This extension also provides some templates for displaying these data.
 
+<!--overview-end-->
 
 # Installation
 
+<!--installation-start-->
 Path variables used below:
 - `$INSTALL_FOLDER` (i.e. where CKAN is installed), e.g. `/usr/lib/ckan/default`
 - `$CONFIG_FILE`, e.g. `/etc/ckan/default/development.ini`
@@ -57,8 +62,11 @@ Path variables used below:
   ckan.plugins = ... gbif
   ```
 
+<!--installation-end-->
+
 # Configuration
 
+<!--configuration-start-->
 These are the options that can be specified in your .ini config file.
 
 ## Template variables **[REQUIRED]**
@@ -68,9 +76,11 @@ Name|Description
 `ckanext.gbif.organisation_key`|For linking to the dataset publisher (i.e. https://gbif.org/publisher/ORG_KEY)
 `ckanext.gbif.dataset_key`|For linking to the dataset itself (i.e. https://gbif.org/dataset/DATA_KEY)
 
+<!--configuration-end-->
 
 # Usage
 
+<!--usage-start-->
 ## Actions
 
 ### `gbif_record_show`
@@ -88,9 +98,11 @@ gbif_record = toolkit.get_action(u'gbif_record_show')(context, {
 
 The templates inherit from `record/specimen.html` and `record/dwc.html` and will insert a link to the GBIF view in the `content_primary_nav` block.
 
+<!--usage-end-->
 
 # Testing
 
+<!--testing-start-->
 There is a Docker compose configuration available in this repository to make it easier to run tests.
 
 To run the tests against ckan 2.9.x on Python3:
@@ -109,3 +121,5 @@ docker-compose run ckan
 ```
 
 The ckan image uses the Dockerfile in the `docker/` folder.
+
+<!--testing-end-->
