@@ -1,0 +1,18 @@
+{
+  "name": "ckanext-gbif",
+  "version": "2.0.0",
+  "description": "A CKAN extension that that connects with the GBIF API.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NaturalHistoryMuseum/ckanext-gbif.git"
+  },
+  "author": "",
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/NaturalHistoryMuseum/ckanext-gbif/issues"
+  },
+  "homepage": "https://github.com/NaturalHistoryMuseum/ckanext-gbif",
+  "dependencies": {
+    "less": "^4.1.3"
+  }
+}
