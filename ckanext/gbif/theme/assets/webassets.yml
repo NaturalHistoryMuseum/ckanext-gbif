@@ -1,5 +1,5 @@
-dqi-css:
-  output: ckanext-gbif/%(version)s_dqi.css
+main-css:
+  output: ckanext-gbif/%(version)s_gbif.css
   filters: less
   config:
     LESS_BIN: ../../../../../node_modules/less/bin/lessc
@@ -14,8 +14,3 @@ dqi-js:
       - base/main
   contents:
     - scripts/gbif-dqi.js
-
-record:
-  output: ckanext-gbif/%(version)s_record.css
-  contents:
-    - css/gbif.css
