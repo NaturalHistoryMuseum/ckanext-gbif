@@ -5,7 +5,6 @@ from ckanext.gbif.lib.helpers import dqi_parse_errors, dqi_get_severity
 
 
 class TestDQIParseErrors:
-
     def test_empty(self):
         assert dqi_parse_errors([]) == []
 
@@ -30,7 +29,6 @@ class TestDQIParseErrors:
 
 
 class TestDQIGetSeverity:
-
     def test_no_gbif_id(self):
         assert dqi_get_severity(MagicMock(), None) == 'unknown'
 
@@ -38,34 +36,18 @@ class TestDQIGetSeverity:
         assert dqi_get_severity([], MagicMock()) == 'No errors'
 
     def test_only_major(self):
-        errors = [
-            {
-                'severity': DQI_MAJOR_ERRORS
-            }
-        ]
+        errors = [{'severity': DQI_MAJOR_ERRORS}]
         assert dqi_get_severity(errors, MagicMock()) == 'Major errors'
 
     def test_only_minor(self):
-        errors = [
-            {
-                'severity': DQI_MINOR_ERRORS
-            }
-        ]
+        errors = [{'severity': DQI_MINOR_ERRORS}]
         assert dqi_get_severity(errors, MagicMock()) == 'Minor errors'
 
     def test_mixed_levels(self):
         errors = [
-            {
-                'severity': DQI_MINOR_ERRORS
-            },
-            {
-                'severity': DQI_MINOR_ERRORS
-            },
-            {
-                'severity': DQI_MAJOR_ERRORS
-            },
-            {
-                'severity': DQI_MINOR_ERRORS
-            }
+            {'severity': DQI_MINOR_ERRORS},
+            {'severity': DQI_MINOR_ERRORS},
+            {'severity': DQI_MAJOR_ERRORS},
+            {'severity': DQI_MINOR_ERRORS},
         ]
         assert dqi_get_severity(errors, MagicMock()) == 'Major errors'

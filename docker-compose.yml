@@ -13,11 +13,11 @@ services:
       - solr
       - redis
     volumes:
-      - .:/srv/app/src/ckanext-gbif
+      - ./ckanext:/base/src/ckanext-gbif/ckanext
+      - ./tests:/base/src/ckanext-gbif/tests
 
   solr:
-    build:
-      context: https://github.com/okfn/docker-ckan.git#:solr
+    image: ckan/ckan-solr:2.9
     logging:
       driver: none
 
