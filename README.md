@@ -73,10 +73,10 @@ These are the options that can be specified in your .ini config file.
 
 ## Template variables **[REQUIRED]**
 
-Name|Description
-----|-----------
-`ckanext.gbif.organisation_key`|For linking to the dataset publisher (i.e. https://gbif.org/publisher/ORG_KEY)
-`ckanext.gbif.dataset_key`|For linking to the dataset itself (i.e. https://gbif.org/dataset/DATA_KEY)
+| Name                            | Description                                                                    |
+|---------------------------------|--------------------------------------------------------------------------------|
+| `ckanext.gbif.organisation_key` | For linking to the dataset publisher (i.e. https://gbif.org/publisher/ORG_KEY) |
+| `ckanext.gbif.dataset_key`      | For linking to the dataset itself (i.e. https://gbif.org/dataset/DATA_KEY)     |
 
 <!--configuration-end-->
 
