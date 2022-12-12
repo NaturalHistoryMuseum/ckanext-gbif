@@ -1,8 +1,6 @@
 main-css:
   output: ckanext-gbif/%(version)s_gbif.css
   filters: less
-  config:
-    LESS_BIN: ../../../../../node_modules/less/bin/lessc
   contents:
     - less/gbif.less
 
