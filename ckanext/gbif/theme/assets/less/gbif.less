@@ -10,13 +10,13 @@ span.dqi-pill {
 }
 
 span.dqi-major-errors {
-  background: #6E001B;
-  border-color: #A42122;
+  background: #6e001b;
+  border-color: #a42122;
 }
 
 span.dqi-minor-errors {
   background: #aa5d00;
-  border-color: #EDAC00;
+  border-color: #edac00;
 }
 
 span.dqi-major-errors,
@@ -26,7 +26,7 @@ span.dqi-minor-errors {
 
 span.dqi-no-errors {
   background: #5f8100;
-  border-color: #73B100;
+  border-color: #73b100;
 }
 
 span.dqi-unknown {
@@ -42,7 +42,7 @@ div#dqi {
     position: absolute;
     right: 0;
     top: 24px;
-    background: #E6E6E6;
+    background: #e6e6e6;
     width: 300px;
     padding: 15px 10px;
 
@@ -54,10 +54,10 @@ div#dqi {
       & li {
         margin: 10px 0;
         padding-left: 0.5em;
-        text-indent: -.7em;
+        text-indent: -0.7em;
 
         &:before {
-          content: "\f111";
+          content: '\f111';
           font-family: FontAwesome;
           font-weight: lighter;
           font-style: normal;
@@ -70,11 +70,11 @@ div#dqi {
         }
 
         &.minor-errors:before {
-          color: #FCC524;
+          color: #fcc524;
         }
 
         &.major-errors:before {
-          color: #DF2621;
+          color: #df2621;
         }
 
         & abbr {
@@ -84,7 +84,6 @@ div#dqi {
     }
   }
 }
-
 
 /* Hide the error list on start */
 .dqi-errors {
@@ -104,7 +103,6 @@ div#dqi {
   }
 }
 
-
 /* On click - active class added */
 .active {
   & .dqi-errors {
@@ -112,7 +110,7 @@ div#dqi {
   }
 
   & span.dqi-pill {
-    background: #E6E6E6;
+    background: #e6e6e6;
     color: #000;
   }
 }
