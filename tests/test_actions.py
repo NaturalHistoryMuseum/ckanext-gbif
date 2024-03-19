@@ -31,12 +31,12 @@ class TestGBIFRecordShow:
         )
 
     def test_timeout(self, requests_mock):
-        gbif_id = 'test'
-        requests_mock.configure_mock(get=MagicMock(side_effect=requests.Timeout))
+        gbif_id = "test"
+        requests_mock.configure_mock(get=MagicMock(side_effect=requests.Timeout()))
         with pytest.raises(toolkit.ObjectNotFound):
             gbif_record_show(MagicMock(), dict(gbif_id=gbif_id))
         assert requests_mock.get.call_args == call(
-            f'https://api.gbif.org/v1/occurrence/{gbif_id}', timeout=5
+            f"https://api.gbif.org/v1/occurrence/{gbif_id}", timeout=5
         )
 
     def test_missing_gbif_id(self, requests_mock):
