@@ -1,6 +1,8 @@
 from unittest.mock import patch, MagicMock, call
 
 import pytest
+import requests
+
 from ckan.plugins import toolkit
 
 from ckanext.gbif.logic.action import gbif_record_show
@@ -22,6 +24,15 @@ class TestGBIFRecordShow:
         gbif_id = 'test'
         mock_response = MagicMock(status_code=404)
         requests_mock.configure_mock(get=MagicMock(return_value=mock_response))
+        with pytest.raises(toolkit.ObjectNotFound):
+            gbif_record_show(MagicMock(), dict(gbif_id=gbif_id))
+        assert requests_mock.get.call_args == call(
+            f'https://api.gbif.org/v1/occurrence/{gbif_id}', timeout=5
+        )
+
+    def test_timeout(self, requests_mock):
+        gbif_id = 'test'
+        requests_mock.configure_mock(get=MagicMock(side_effect=requests.Timeout))
         with pytest.raises(toolkit.ObjectNotFound):
             gbif_record_show(MagicMock(), dict(gbif_id=gbif_id))
         assert requests_mock.get.call_args == call(
