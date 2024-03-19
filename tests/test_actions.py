@@ -32,6 +32,9 @@ class TestGBIFRecordShow:
 
     def test_timeout(self, requests_mock):
         gbif_id = "test"
+        # we mock the entire requests module so we need to put the Timeout class back
+        # before we use it
+        requests_mock.Timeout = requests.Timeout
         requests_mock.configure_mock(get=MagicMock(side_effect=requests.Timeout()))
         with pytest.raises(toolkit.ObjectNotFound):
             gbif_record_show(MagicMock(), dict(gbif_id=gbif_id))
