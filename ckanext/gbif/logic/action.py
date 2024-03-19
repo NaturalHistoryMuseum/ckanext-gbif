@@ -21,7 +21,7 @@ def gbif_record_show(context, data_dict):
         response = requests.get(
             f"https://api.gbif.org/v1/occurrence/{gbif_id}", timeout=5
         )
-    except requests.exceptions.Timeout:
+    except requests.Timeout:
         raise toolkit.ObjectNotFound("GBIF request timed out")
     # if there was an error getting the record, raise a not found error
     if 400 <= response.status_code < 600:
