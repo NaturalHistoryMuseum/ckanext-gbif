@@ -1,5 +1,33 @@
 # Changelog
 
+## v2.1.9 (2024-03-25)
+
+### Fix
+
+- if gbif api errors, return an object instead of an error class
+- put a timeout on the gbif api request to avoid waiting forever
+
+### Refactor
+
+- use requests.Timeout instead of getting it from the requests.exceptions module
+
+### Tests
+
+- fix tests
+- correctly use mock side_effects
+- add a test for the timeout
+- fix tests
+
+### Chores/Misc
+
+- add build section to read the docs config
+- add regex for version line in citation file
+- add citation.cff to list of files with version
+- add contributing guidelines
+- add code of conduct
+- add citation file
+- update support.md links
+
 ## v2.1.8 (2023-07-17)
 
 ### Docs
