@@ -1,6 +1,8 @@
 from unittest.mock import patch, MagicMock, call
 
 import pytest
+import requests
+
 from ckan.plugins import toolkit
 
 from ckanext.gbif.logic.action import gbif_record_show
@@ -15,7 +17,7 @@ class TestGBIFRecordShow:
         record = gbif_record_show(MagicMock(), dict(gbif_id=gbif_id))
         assert record == mock_response.json()
         assert requests_mock.get.call_args == call(
-            f'https://api.gbif.org/v1/occurrence/{gbif_id}'
+            f'https://api.gbif.org/v1/occurrence/{gbif_id}', timeout=5
         )
 
     def test_failure(self, requests_mock):
@@ -25,7 +27,19 @@ class TestGBIFRecordShow:
         with pytest.raises(toolkit.ObjectNotFound):
             gbif_record_show(MagicMock(), dict(gbif_id=gbif_id))
         assert requests_mock.get.call_args == call(
-            f'https://api.gbif.org/v1/occurrence/{gbif_id}'
+            f'https://api.gbif.org/v1/occurrence/{gbif_id}', timeout=5
+        )
+
+    def test_timeout(self, requests_mock):
+        gbif_id = "test"
+        # we mock the entire requests module so we need to put the Timeout class back
+        # before we use it
+        requests_mock.Timeout = requests.Timeout
+        requests_mock.configure_mock(get=MagicMock(side_effect=requests.Timeout()))
+        with pytest.raises(toolkit.ObjectNotFound):
+            gbif_record_show(MagicMock(), dict(gbif_id=gbif_id))
+        assert requests_mock.get.call_args == call(
+            f"https://api.gbif.org/v1/occurrence/{gbif_id}", timeout=5
         )
 
     def test_missing_gbif_id(self, requests_mock):
@@ -46,5 +60,5 @@ class TestGBIFRecordShow:
         record = toolkit.get_action('gbif_record_show')({}, dict(gbif_id=gbif_id))
         assert record == mock_response.json()
         assert requests_mock.get.call_args == call(
-            f'https://api.gbif.org/v1/occurrence/{gbif_id}'
+            f'https://api.gbif.org/v1/occurrence/{gbif_id}', timeout=5
         )
