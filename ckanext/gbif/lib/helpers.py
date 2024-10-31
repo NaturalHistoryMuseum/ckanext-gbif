@@ -20,7 +20,7 @@ def dqi_parse_errors(errors):
     Convert each DQI status string into a more detailed dict.
 
     :param errors: a list of error names
-    :return: a list of dicts of information about each error
+    :returns: a list of dicts of information about each error
     """
     if not errors:
         return []
@@ -36,7 +36,7 @@ def dqi_get_severity(errors, gbif_id):
 
     :param errors: a list of errors
     :param gbif_id: the GBIF occurrence id for this record
-    :return: the status to show
+    :returns: the status to show
     """
     if not gbif_id:
         return 'unknown'
@@ -83,9 +83,9 @@ def gbif_get_classification(gbif_record):
 
 
 def gbif_get_geography(occurrence):
-    '''
+    """
     :param occurrence:
-    '''
+    """
     geography = []
     for geographic_part in ['continent', 'country', 'stateprovince']:
         value = occurrence.get(geographic_part, None)
@@ -113,7 +113,7 @@ def get_gbif_record_url(pkg, res, rec):
     :param pkg: the package dict
     :param res: the resource dict
     :param rec: the record dict
-    :return: the link to the GBIF view for this record/resource/package combo
+    :returns: the link to the GBIF view for this record/resource/package combo
     """
     # return the url for package/resource/record combo requested
     return toolkit.url_for(
@@ -133,7 +133,7 @@ def build_gbif_nav_item(package_name, resource_id, record_id, version=None):
     :param resource_id: the resource id
     :param record_id: the record id
     :param version: the version of the record, or None if no version is present
-    :return: a nav items
+    :returns: a nav items
     """
     kwargs = {
         'package_name': package_name,

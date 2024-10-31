@@ -1,7 +1,7 @@
 from unittest.mock import MagicMock
 
-from ckanext.gbif.lib.errors import GBIF_ERRORS, DQI_MAJOR_ERRORS, DQI_MINOR_ERRORS
-from ckanext.gbif.lib.helpers import dqi_parse_errors, dqi_get_severity
+from ckanext.gbif.lib.errors import DQI_MAJOR_ERRORS, DQI_MINOR_ERRORS, GBIF_ERRORS
+from ckanext.gbif.lib.helpers import dqi_get_severity, dqi_parse_errors
 
 
 class TestDQIParseErrors:
