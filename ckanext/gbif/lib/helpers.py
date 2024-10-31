@@ -83,9 +83,9 @@ def gbif_get_classification(gbif_record):
 
 
 def gbif_get_geography(occurrence):
-    '''
+    """
     :param occurrence:
-    '''
+    """
     geography = []
     for geographic_part in ['continent', 'country', 'stateprovince']:
         value = occurrence.get(geographic_part, None)
