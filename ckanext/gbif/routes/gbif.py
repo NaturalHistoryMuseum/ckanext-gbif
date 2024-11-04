@@ -4,9 +4,8 @@
 # This file is part of ckanext-gbif
 # Created by the Natural History Museum in London, UK
 
-from flask import Blueprint
-
 from ckan.plugins import toolkit
+from flask import Blueprint
 
 blueprint = Blueprint(
     name='gbif',

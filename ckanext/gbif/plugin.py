@@ -5,13 +5,14 @@
 # Created by the Natural History Museum in London, UK
 
 from ckan.plugins import SingletonPlugin, implements, interfaces, toolkit
+
 from ckanext.gbif import routes
 from ckanext.gbif.lib import helpers
 from ckanext.gbif.logic.action import gbif_record_show
 
 
 class GBIFPlugin(SingletonPlugin):
-    '''GBIF plugin - Data Quality Indicators'''
+    """GBIF plugin - Data Quality Indicators"""
 
     implements(interfaces.IActions, inherit=True)
     implements(interfaces.IConfigurer)
