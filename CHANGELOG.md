@@ -1,5 +1,36 @@
 # Changelog
 
+## v2.1.11 (2024-11-04)
+
+### Docs
+
+- use variable logo based on colour scheme
+- fix tests badge tests workflow file was renamed
+- standardise returns field
+
+### Style
+
+- automatic reformat auto reformat with ruff/docformatter/prettier after config changes
+
+### Build System(s)
+
+- remove version from docker compose file version specifier is deprecated
+
+### CI System(s)
+
+- fix python setup action version
+- add merge to valid commit types
+- add docformatter args and dependency docformatter currently can't read from pyproject.toml without tomli
+- only apply auto-fixes in pre-commit F401 returns linting errors as well as auto-fixes, so this disables the errors and just applies the fixes
+- update tool config update pre-commit repo versions and switch black to ruff
+- add pull request validation workflow new workflow to check commit format and code style against pre-commit config
+- update workflow files standardise format, change name of tests file
+
+### Chores/Misc
+
+- add pull request template
+- update tool details in contributing guide
+
 ## v2.1.10 (2024-08-20)
 
 ## v2.1.9 (2024-03-25)
