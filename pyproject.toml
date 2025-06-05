@@ -21,7 +21,7 @@ classifiers = [
 dependencies = [
     "python-dateutil",
     "requests",
-    "ckantools>=0.4.1"
+    "ckantools>=0.4.2"
 ]
 
 [project.optional-dependencies]
