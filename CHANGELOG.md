@@ -1,5 +1,22 @@
 # Changelog
 
+## v2.1.12 (2025-06-09)
+
+### Style
+
+- fix string wrapping
+
+### Build System(s)
+
+- remove pylint, add ruff lint ignore rules
+- update ckantools
+
+### CI System(s)
+
+- set ruff target py version, add more ignores - avoid using fixes that don't work for python 3.8 (our current version) - ignore recommended ruff formatter conflicts - ignore more docstring rules
+- add ruff lint rules
+- update pre-commit repo versions
+
 ## v2.1.11 (2024-11-04)
 
 ### Docs
