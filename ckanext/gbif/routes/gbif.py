@@ -10,8 +10,7 @@ from flask import Blueprint
 blueprint = Blueprint(
     name='gbif',
     import_name=__name__,
-    url_prefix='/dataset/<package_name>/resource/<resource_id>/record'
-    '/<record_id>/gbif',
+    url_prefix='/dataset/<package_name>/resource/<resource_id>/record/<record_id>/gbif',
 )
 
 
