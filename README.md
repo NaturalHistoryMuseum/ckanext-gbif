@@ -100,9 +100,9 @@ Get the associated GBIF data for a record.
 ```python
 from ckan.plugins import toolkit
 
-gbif_record = toolkit.get_action(u'gbif_record_show')(context, {
-    u'occurrence_id': record_gbif_occurrence_id
-    })
+gbif_record = toolkit.get_action('gbif_record_show')(
+    context, {'occurrence_id': record_gbif_occurrence_id}
+)
 ```
 
 ## Templates

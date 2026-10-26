@@ -10,8 +10,9 @@ from ckan.plugins import toolkit
 
 def gbif_record_show(context, data_dict):
     """
-    Retrieve a GBIF record with the given GBIF ID. This is done via the GBIF API.
+    Retrieve a GBIF record with the given GBIF ID.
 
+    This is done via the GBIF API.
     :param context: CKAN context
     :param data_dict: dict of parameters, only one is required: gbif_id
     """
