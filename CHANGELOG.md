@@ -1,5 +1,20 @@
 # Changelog
 
+## v2.1.13 (2026-10-26)
+
+### Refactor
+
+- run pre-commit and refactor all files
+
+### CI System(s)
+
+- update pre-commit config
+- update action versions update the actions to the latest versions
+
+### Chores/Misc
+
+- update team names
+
 ## v2.1.12 (2025-06-09)
 
 ### Style
